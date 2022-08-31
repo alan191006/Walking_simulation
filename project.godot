@@ -9,12 +9,24 @@
 config_version=4
 
 _global_script_classes=[ {
+"base": "ResourceFormatLoader",
+"class": "HTerrainDataLoader",
+"language": "GDScript",
+"path": "res://godot_heightmap_plugin-master/addons/zylann.hterrain/hterrain_resource_loader.gd"
+}, {
+"base": "ResourceFormatSaver",
+"class": "HTerrainDataSaver",
+"language": "GDScript",
+"path": "res://godot_heightmap_plugin-master/addons/zylann.hterrain/hterrain_resource_saver.gd"
+}, {
 "base": "KinematicBody",
 "class": "MovementController",
 "language": "GDScript",
 "path": "res://Player/MovementController.gd"
 } ]
 _global_script_class_icons={
+"HTerrainDataLoader": "",
+"HTerrainDataSaver": "",
 "MovementController": ""
 }
 
@@ -23,6 +35,10 @@ _global_script_class_icons={
 config/name="First Person Starter"
 run/main_scene="res://Levels/Main/L_Main.tscn"
 config/icon="res://icon.png"
+
+[editor_plugins]
+
+enabled=PoolStringArray( "res://addons/zylann.hterrain/plugin.cfg" )
 
 [gui]
 
