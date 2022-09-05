@@ -1,4 +1,4 @@
-[gd_scene load_steps=10 format=2]
+[gd_scene load_steps=11 format=2]
 
 [ext_resource path="res://Player/Player.tscn" type="PackedScene" id=1]
 [ext_resource path="res://Levels/Main/Geometry/Floor.tscn" type="PackedScene" id=2]
@@ -8,6 +8,7 @@
 [ext_resource path="res://Levels/Main/Geometry/Cube.tscn" type="PackedScene" id=6]
 [ext_resource path="res://nas_-_the_lost_tapes_cd.jpg" type="Texture" id=7]
 [ext_resource path="res://Levels/Main/Nas-TheLostTapesCd.gd" type="Script" id=8]
+[ext_resource path="res://Levels/Main/Pause menu.gd" type="Script" id=9]
 
 [sub_resource type="Skin" id=1]
 
@@ -118,16 +119,72 @@ shadow_enabled = true
 shadow_bias = 0.05
 directional_shadow_max_distance = 250.0
 
-[node name="CanvasLayer" type="CanvasLayer" parent="."]
+[node name="GUI" type="CanvasLayer" parent="."]
 
-[node name="Control" type="Control" parent="CanvasLayer"]
+[node name="Book" type="Control" parent="GUI"]
 margin_right = 40.0
 margin_bottom = 40.0
 
-[node name="Sprite" type="Sprite" parent="CanvasLayer/Control"]
+[node name="Sprite" type="Sprite" parent="GUI/Book"]
 
-[node name="Nas-TheLostTapesCd" type="Sprite" parent="CanvasLayer/Control/Sprite"]
+[node name="Nas-TheLostTapesCd" type="Sprite" parent="GUI/Book/Sprite"]
 position = Vector2( 479, 302 )
 scale = Vector2( 0.807692, 0.796923 )
 texture = ExtResource( 7 )
 script = ExtResource( 8 )
+
+[node name="Pause menu 2" type="CanvasLayer" parent="."]
+
+[node name="Pause menu" type="Control" parent="Pause menu 2"]
+pause_mode = 2
+anchor_right = 1.0
+anchor_bottom = 1.0
+script = ExtResource( 9 )
+
+[node name="ColorRect" type="ColorRect" parent="Pause menu 2/Pause menu"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+color = Color( 0.486275, 0.647059, 0.305882, 1 )
+
+[node name="CenterContainer" type="CenterContainer" parent="Pause menu 2/Pause menu"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+__meta__ = {
+"_edit_use_anchors_": true
+}
+
+[node name="VBoxContainer" type="VBoxContainer" parent="Pause menu 2/Pause menu/CenterContainer"]
+margin_left = 472.0
+margin_top = 255.0
+margin_right = 552.0
+margin_bottom = 344.0
+custom_constants/separation = 5
+
+[node name="Paused" type="Label" parent="Pause menu 2/Pause menu/CenterContainer/VBoxContainer"]
+margin_right = 80.0
+margin_bottom = 14.0
+text = "PAUSED"
+align = 1
+valign = 1
+
+[node name="Resume" type="Button" parent="Pause menu 2/Pause menu/CenterContainer/VBoxContainer"]
+margin_top = 19.0
+margin_right = 80.0
+margin_bottom = 39.0
+text = "Resume"
+
+[node name="Options" type="Button" parent="Pause menu 2/Pause menu/CenterContainer/VBoxContainer"]
+margin_top = 44.0
+margin_right = 80.0
+margin_bottom = 64.0
+rect_min_size = Vector2( 80, 0 )
+text = "Options"
+
+[node name="Quit" type="Button" parent="Pause menu 2/Pause menu/CenterContainer/VBoxContainer"]
+margin_top = 69.0
+margin_right = 80.0
+margin_bottom = 89.0
+text = "Quit"
+
+[connection signal="pressed" from="Pause menu 2/Pause menu/CenterContainer/VBoxContainer/Resume" to="Pause menu 2/Pause menu" method="_on_Resume_pressed"]
+[connection signal="pressed" from="Pause menu 2/Pause menu/CenterContainer/VBoxContainer/Quit" to="Pause menu 2/Pause menu" method="_on_Quit_pressed"]

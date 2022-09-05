@@ -22,12 +22,10 @@ func _ready() -> void:
 	set_process_input(fast_close)
 
 
-func _input(event: InputEvent) -> void:
-	if event.is_action_pressed("ui_cancel"):
-		get_tree().quit() # Quits the game
 	
 
 
 # Capture mouse if clicked on the game, needed for HTML5
 # Called when an InputEvent hasn't been consumed by _input() or any GUI item
+
 
