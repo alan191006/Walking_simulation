@@ -1,0 +1,18 @@
+[gd_scene load_steps=3 format=2]
+
+[ext_resource path="res://Tree/Tree 3/tree_X12_+X1_Rock_Pack+bonus_/tree_bonus.obj" type="ArrayMesh" id=1]
+
+[sub_resource type="CapsuleShape" id=1]
+
+[node name="Spatial" type="Spatial"]
+
+[node name="StaticBody" type="StaticBody" parent="."]
+transform = Transform( 0.466277, 0, 0, 0, 0.466277, 0, 0, 0, 0.466277, 1, 1, 1 )
+
+[node name="CollisionShape" type="CollisionShape" parent="StaticBody"]
+transform = Transform( 1, 0, 0, 0, -4.37114e-08, 1, 0, -1, -4.37114e-08, 1, 9, 1 )
+shape = SubResource( 1 )
+
+[node name="tree_bonus" type="MeshInstance" parent="StaticBody"]
+transform = Transform( 2.60498, 0, 0, 0, 2.60498, 0, 0, 0, 2.60498, 1, 1, 1 )
+mesh = ExtResource( 1 )
