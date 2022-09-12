@@ -33,7 +33,7 @@ _global_script_class_icons={
 [application]
 
 config/name="Test"
-run/main_scene="res://Spatial.tscn"
+run/main_scene="res://Main_scene.tscn"
 config/icon="res://icon.png"
 
 [editor_plugins]
@@ -79,6 +79,11 @@ sprint={
 cheat_code_green={
 "deadzone": 0.5,
 "events": [ Object(InputEventKey,"resource_local_to_scene":false,"resource_name":"","device":0,"alt":false,"shift":false,"control":false,"meta":false,"command":false,"pressed":false,"scancode":0,"physical_scancode":49,"unicode":0,"echo":false,"script":null)
+ ]
+}
+book={
+"deadzone": 0.5,
+"events": [ Object(InputEventKey,"resource_local_to_scene":false,"resource_name":"","device":0,"alt":false,"shift":false,"control":false,"meta":false,"command":false,"pressed":false,"scancode":0,"physical_scancode":69,"unicode":0,"echo":false,"script":null)
  ]
 }
 

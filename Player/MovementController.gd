@@ -10,14 +10,17 @@ export(float, 0.0, 1.0, 0.05) var air_control := 0.3
 export var jump_height := 10
 var direction := Vector3()
 var input_axis := Vector2()
-var velocity := Vector3()
 var snap := Vector3()
 var up_direction := Vector3.UP
+export var fall_acceleration := 75.0
 var stop_on_slope := true
+var is_inventory_on = false
 onready var floor_max_angle: float = deg2rad(45.0)
 # Get the gravity from the project settings to be synced with RigidDynamicBody nodes.
 onready var gravity = (ProjectSettings.get_setting("physics/3d/default_gravity") 
 		* gravity_multiplier)
+		
+var velocity = Vector3.ZERO
 
 
 # Called every physics tick. 'delta' is constant
@@ -25,7 +28,26 @@ func _physics_process(delta) -> void:
 	input_axis = Input.get_vector("move_back", "move_forward",
 			"move_left", "move_right")
 	
-	direction_input()
+	var direction = Vector3.ZERO
+	print(direction)
+	# We check for each move input and update the direction accordingly.
+	if Input.is_action_pressed("move_right"):
+		direction.x += 1
+	if Input.is_action_pressed("move_left"):
+		direction.x -= 1
+	if Input.is_action_pressed("move_back"):
+		direction.z += 1
+	if Input.is_action_pressed("move_forward"):
+		direction.z -= 1
+	
+	if direction != Vector3.ZERO:
+		direction = direction.normalized()
+		$Pivot.look_at(translation + direction, Vector3.UP)
+		
+	velocity.x = direction.x * speed
+	velocity.z = direction.z * speed
+	velocity.y -= fall_acceleration * delta
+	velocity = move_and_slide(velocity, Vector3.UP)
 	
 	if is_on_floor():
 		snap = -get_floor_normal() - get_floor_velocity() * delta
@@ -51,22 +73,6 @@ func _physics_process(delta) -> void:
 	velocity = move_and_slide_with_snap(velocity, snap, up_direction, 
 			stop_on_slope, 4, floor_max_angle)
 
-
-func direction_input() -> void:
-	direction = Vector3()
-	var aim: Basis = get_global_transform().basis
-	if input_axis.x >= 0.5:
-		direction -= aim.z
-	if input_axis.x <= -0.5:
-		direction += aim.z
-	if input_axis.y <= -0.5:
-		direction -= aim.x
-	if input_axis.y >= 0.5:
-		direction += aim.x
-	direction.y = 0
-	direction = direction.normalized()
-
-
 func accelerate(delta: float) -> void:
 	# Using only the horizontal velocity, interpolate towards the input.
 	var temp_vel := velocity
@@ -87,3 +93,13 @@ func accelerate(delta: float) -> void:
 	
 	velocity.x = temp_vel.x
 	velocity.z = temp_vel.z
+
+func _input(event: InputEvent) -> void:
+	if event.is_action_pressed("Book"):
+		is_inventory_on = not is_inventory_on
+		match Input.get_mouse_mode():
+			Input.MOUSE_MODE_CAPTURED:
+				Input.set_mouse_mode(Input.MOUSE_MODE_VISIBLE)
+			Input.MOUSE_MODE_VISIBLE:
+				Input.set_mouse_mode(Input.MOUSE_MODE_CAPTURED) 
+				

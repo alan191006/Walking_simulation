@@ -1,120 +1,91 @@
 extends KinematicBody
 
-
 export(NodePath) var cam_path := NodePath("Camera")
 onready var cam: Camera = get_node(cam_path)
-export var jump_height := 10
-export var gravity_multiplier := 4.0
+
+var gravity : float = 15.0
 var stop_on_slope := true
+export var jump_height := 10
 onready var floor_max_angle: float = deg2rad(45.0)
-export var mouse_sensitivity := 2.0
-export var y_limit := 90.0
-var mouse_axis := Vector2()
+
+var moveSpeed : float = 16.0
 export var acceleration := 8
 export var deceleration := 10
-var direction := Vector3()
-var rot := Vector3()
-export var speed := 20
+export(float, 0.0, 1.0, 0.05) var air_control := 0.3
+
 var input_axis := Vector2()
 var velocity := Vector3()
-var up_direction := Vector3.UP
-# stats
-var curHp : int = 10
-var maxHp : int = 10
-var ammo : int = 15
-var score: int = 0
+var direction := Vector3()
 
-# physics
-var moveSpeed : float = 16.0
-var jumpForce : float = 10.0
-var gravity : float = 12.0
+var is_inventory_on = false
 
 # cam look
 var minLookAngle : float = 0.0
 var maxLookAngle : float = 180.0
 var lookSensitivity : float = 10.0
 var snap := Vector3()
-export(float, 0.0, 1.0, 0.05) var air_control := 0.3
+
 # vectors
-var vel : Vector3 = Vector3()
 var mouseDelta : Vector2 = Vector2()
 
-# components
-onready var camera : Camera = get_node("Camera")
-
 func _ready ():
-	
-	# hide and lock the mouse cursor
 	Input.set_mouse_mode(Input.MOUSE_MODE_CAPTURED)
-	
-	# set the UI
 
-
-# called 60 times a second
 func _physics_process(delta) -> void:
-	input_axis = Input.get_vector("move_back", "move_forward",
-			"move_left", "move_right")
-	
-	direction_input()
-	
-	if is_on_floor():
-		snap = -get_floor_normal() - get_floor_velocity() * delta
+	if not is_inventory_on:
+		input_axis = Input.get_vector("move_back", "move_forward",
+				"move_left", "move_right")
 		
-		# Workaround for sliding down after jump on slope
-		if velocity.y < 0:
-			velocity.y = 0
+		direction_input()
 		
-		if Input.is_action_just_pressed("jump"):
+		if is_on_floor():
+			snap = -get_floor_normal() - get_floor_velocity() * delta
+			
+			# Workaround for sliding down after jump on slope
+			if velocity.y < 0:
+				velocity.y = 0
+			
+			if Input.is_action_just_pressed("jump"):
+				snap = Vector3.ZERO
+				velocity.y = jump_height
+		else:
+			# Workaround for 'vertical bump' when going off platform
+			if snap != Vector3.ZERO && velocity.y != 0:
+				velocity.y = 0
+			
 			snap = Vector3.ZERO
-			velocity.y = jump_height
-	else:
-		# Workaround for 'vertical bump' when going off platform
-		if snap != Vector3.ZERO && velocity.y != 0:
-			velocity.y = 0
+			
+			velocity.y -= gravity * delta
 		
-		snap = Vector3.ZERO
+		accelerate(delta)
 		
-		velocity.y -= gravity * delta
-	
-	accelerate(delta)
-	
-	velocity = move_and_slide_with_snap(velocity, snap, up_direction, 
-			stop_on_slope, 4, floor_max_angle)
+		velocity = move_and_slide_with_snap(velocity, snap, Vector3.UP, 
+				stop_on_slope, 4, floor_max_angle)
 
-
-# called every frame	
 func _process(delta):
 	
-	# rotate the camera along the x axis
-	cam.rotation_degrees.x -= mouseDelta.y * lookSensitivity * delta
-	
-	# clamp camera x rotation axis
-	cam.rotation_degrees.x = clamp(cam.rotation_degrees.x, minLookAngle, maxLookAngle)
-	
-	# rotate the player along their y axis
-	rotation_degrees.y -= mouseDelta.x * lookSensitivity * delta
-	
-	# reset the mouse delta vector
-	mouseDelta = Vector2()
+	if not is_inventory_on:
+		cam.rotation_degrees.x -= mouseDelta.y * lookSensitivity * delta
+		cam.rotation_degrees.x = clamp(cam.rotation_degrees.x, minLookAngle, maxLookAngle)
+		rotation_degrees.y -= mouseDelta.x * lookSensitivity * delta
+		mouseDelta = Vector2()
 
-# called when an input is detected
 func _input(event):
 	
 	if event is InputEventMouseMotion:
 		mouseDelta = event.relative
 		
-	if event.is_action_pressed("ui_cancel"):
-			match Input.get_mouse_mode():
-				Input.MOUSE_MODE_CAPTURED:
-					Input.set_mouse_mode(Input.MOUSE_MODE_VISIBLE)
-				Input.MOUSE_MODE_VISIBLE:
-					Input.set_mouse_mode(Input.MOUSE_MODE_CAPTURED)
+	if event.is_action_pressed("book"):
+		is_inventory_on = not is_inventory_on
+		match Input.get_mouse_mode():
+			Input.MOUSE_MODE_CAPTURED:
+				Input.set_mouse_mode(Input.MOUSE_MODE_VISIBLE)
+			Input.MOUSE_MODE_VISIBLE:
+				Input.set_mouse_mode(Input.MOUSE_MODE_CAPTURED)
 	if event.is_action_pressed("sprint"):
-		speed = 20
+		moveSpeed = 30
 	else:
-		speed = 15
-		
-
+		moveSpeed = 20
 
 func direction_input() -> void:
 	direction = Vector3()
@@ -130,14 +101,13 @@ func direction_input() -> void:
 	direction.y = 0
 	direction = direction.normalized()
 
-
 func accelerate(delta: float) -> void:
 	# Using only the horizontal velocity, interpolate towards the input.
 	var temp_vel := velocity
 	temp_vel.y = 0
 	
 	var temp_accel: float
-	var target: Vector3 = direction * speed
+	var target: Vector3 = direction * moveSpeed
 	
 	if direction.dot(temp_vel) > 0:
 		temp_accel = acceleration
