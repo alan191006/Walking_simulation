@@ -75,7 +75,7 @@ func _physics_process(delta) -> void:
 
 func accelerate(delta: float) -> void:
 	# Using only the horizontal velocity, interpolate towards the input.
-	var temp_vel := velocity
+	var temp_vel = velocity
 	temp_vel.y = 0
 	
 	var temp_accel: float

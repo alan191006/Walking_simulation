@@ -27,7 +27,7 @@ onready var bulletScene = load("res://Bullet.tscn")
 onready var ui : Node = get_node("/root/MainScene/CanvasLayer/UI")
 
 func _ready ():
-	
+	print(self.get_path())
 	# hide and lock the mouse cursor
 	Input.set_mouse_mode(Input.MOUSE_MODE_CAPTURED)
 	
