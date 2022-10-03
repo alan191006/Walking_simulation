@@ -3,8 +3,8 @@ extends KinematicBody
 
 export(NodePath) var cam_path := NodePath("Camera")
 onready var cam: Camera = get_node(cam_path)
-export var jump_height := 10
-export var gravity_multiplier := 50
+export var jump_height := 500
+export var gravity_multiplier := 4
 var stop_on_slope := true
 onready var floor_max_angle: float = deg2rad(45.0)
 export var mouse_sensitivity := 2.0
@@ -25,9 +25,9 @@ var ammo : int = 15
 var score: int = 0
 
 # physics
-var moveSpeed : float = 16.0
+var moveSpeed : float = 100
 var jumpForce : float = 10.0
-var gravity : float = 12.0
+var gravity : float = 1000.0
 
 # cam look
 var minLookAngle : float = 0.0
