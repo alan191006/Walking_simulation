@@ -14,7 +14,7 @@ export var acceleration := 8
 export var deceleration := 10
 var direction := Vector3()
 var rot := Vector3()
-export var speed := 20
+export var speed := 2000
 var input_axis := Vector2()
 var velocity := Vector3()
 var up_direction := Vector3.UP
@@ -110,9 +110,9 @@ func _input(event):
 				Input.MOUSE_MODE_VISIBLE:
 					Input.set_mouse_mode(Input.MOUSE_MODE_CAPTURED)
 	if event.is_action_pressed("sprint"):
-		speed = 20
+		speed = 2000
 	else:
-		speed = 15
+		speed = 2000
 		
 
 

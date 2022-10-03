@@ -1,0 +1,9 @@
+{
+	"contains_albedo": false,
+	"resolution": 1024,
+	"src": {
+		"a": "res://Ground/Rock031_1K-PNG/Rock031_1K_Roughness.png",
+		"normalmap_flip_y": true,
+		"rgb": "res://Ground/Rock031_1K-PNG/Rock031_1K_NormalGL.png"
+	}
+}

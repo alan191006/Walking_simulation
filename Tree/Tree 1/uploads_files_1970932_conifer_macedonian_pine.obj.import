@@ -1,0 +1,20 @@
+[remap]
+
+importer="wavefront_obj"
+type="Mesh"
+path="res://.import/uploads_files_1970932_conifer_macedonian_pine.obj-d97b7f8e945f16c69a6573da35f70a17.mesh"
+
+[deps]
+
+files=[ "res://.import/uploads_files_1970932_conifer_macedonian_pine.obj-d97b7f8e945f16c69a6573da35f70a17.mesh" ]
+
+source_file="res://Tree/Tree 1/uploads_files_1970932_conifer_macedonian_pine.obj"
+dest_files=[ "res://.import/uploads_files_1970932_conifer_macedonian_pine.obj-d97b7f8e945f16c69a6573da35f70a17.mesh", "res://.import/uploads_files_1970932_conifer_macedonian_pine.obj-d97b7f8e945f16c69a6573da35f70a17.mesh" ]
+
+[params]
+
+generate_tangents=true
+scale_mesh=Vector3( 1, 1, 1 )
+offset_mesh=Vector3( 0, 0, 0 )
+octahedral_compression=true
+optimize_mesh_flags=4286

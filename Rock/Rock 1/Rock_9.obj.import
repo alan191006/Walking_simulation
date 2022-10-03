@@ -1,0 +1,20 @@
+[remap]
+
+importer="wavefront_obj"
+type="Mesh"
+path="res://.import/Rock_9.obj-2189327f09aeb63f8d9cf77536b3764c.mesh"
+
+[deps]
+
+files=[ "res://.import/Rock_9.obj-2189327f09aeb63f8d9cf77536b3764c.mesh" ]
+
+source_file="res://Rock/Rock 1/Rock_9.obj"
+dest_files=[ "res://.import/Rock_9.obj-2189327f09aeb63f8d9cf77536b3764c.mesh", "res://.import/Rock_9.obj-2189327f09aeb63f8d9cf77536b3764c.mesh" ]
+
+[params]
+
+generate_tangents=true
+scale_mesh=Vector3( 1, 1, 1 )
+offset_mesh=Vector3( 0, 0, 0 )
+octahedral_compression=true
+optimize_mesh_flags=4286
