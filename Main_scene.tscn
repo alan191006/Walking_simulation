@@ -646,7 +646,7 @@ script = ExtResource( 5 )
 [node name="ColorRect" type="ColorRect" parent="Pause menu 2/Pause menu"]
 anchor_right = 1.0
 anchor_bottom = 1.0
-color = Color( 0.713726, 0.921569, 0.482353, 1 )
+color = Color( 0.713726, 0.921569, 0.482353, 0.509804 )
 
 [node name="CenterContainer" type="CenterContainer" parent="Pause menu 2/Pause menu"]
 anchor_right = 1.0

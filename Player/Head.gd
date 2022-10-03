@@ -4,7 +4,7 @@ extends KinematicBody
 export(NodePath) var cam_path := NodePath("Camera")
 onready var cam: Camera = get_node(cam_path)
 export var jump_height := 10
-export var gravity_multiplier := 4.0
+export var gravity_multiplier := 50
 var stop_on_slope := true
 onready var floor_max_angle: float = deg2rad(45.0)
 export var mouse_sensitivity := 2.0
@@ -102,17 +102,11 @@ func _input(event):
 	
 	if event is InputEventMouseMotion:
 		mouseDelta = event.relative
-		
-	if event.is_action_pressed("ui_cancel"):
-			match Input.get_mouse_mode():
-				Input.MOUSE_MODE_CAPTURED:
-					Input.set_mouse_mode(Input.MOUSE_MODE_VISIBLE)
-				Input.MOUSE_MODE_VISIBLE:
-					Input.set_mouse_mode(Input.MOUSE_MODE_CAPTURED)
+	
 	if event.is_action_pressed("sprint"):
-		speed = 2000
+		speed = 4000
 	else:
-		speed = 2000
+		speed = 500
 		
 
 
