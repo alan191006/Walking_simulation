@@ -46,6 +46,7 @@ func _ready ():
 	
 	# hide and lock the mouse cursor
 	Input.set_mouse_mode(Input.MOUSE_MODE_CAPTURED)
+	Input.set_mouse_mode(Input.MOUSE_MODE_VISIBLE)
 	
 	# set the UI
 

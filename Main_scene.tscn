@@ -1,4 +1,4 @@
-[gd_scene load_steps=41 format=2]
+[gd_scene load_steps=43 format=2]
 
 [ext_resource path="res://Player/Head.gd" type="Script" id=1]
 [ext_resource path="res://addons/zylann.scatter/scatter3d.gd" type="Script" id=2]
@@ -25,10 +25,12 @@
 [ext_resource path="res://Shaders/hterrain_enhanced.shader" type="Shader" id=23]
 [ext_resource path="res://Rock/Rock 1/Rock.tscn" type="PackedScene" id=24]
 [ext_resource path="res://Main_scene_slot0_albedo_bump.packed_tex" type="Texture" id=25]
+[ext_resource path="res://Tutorial banner.png" type="Texture" id=26]
 [ext_resource path="res://addons/waterways/textures/foam_noise.png" type="Texture" id=27]
 [ext_resource path="res://addons/waterways/river_manager.gd" type="Script" id=28]
 [ext_resource path="res://addons/waterways/shaders/river.shader" type="Shader" id=29]
 [ext_resource path="res://addons/waterways/textures/water1_normal_bump.png" type="Texture" id=30]
+[ext_resource path="res://TutorialBanner.gd" type="Script" id=31]
 
 [sub_resource type="Curve3D" id=26]
 bake_interval = 0.05
@@ -630,6 +632,7 @@ margin_bottom = 40.0
 [node name="Sprite" type="Sprite" parent="GUI/Book"]
 
 [node name="BookNoBg" type="Sprite" parent="GUI/Book/Sprite"]
+pause_mode = 2
 position = Vector2( 513, 301 )
 scale = Vector2( 1.41944, 1.24583 )
 texture = ExtResource( 10 )
@@ -709,6 +712,23 @@ transform = Transform( 65, 0, 0, 0, 65, 0, 0, 0, 65, 214, 1, 402.124 )
 transform = Transform( 65, 0, 0, 0, 65, 0, 0, 0, 65, 127.901, 1, 1241.97 )
 script = ExtResource( 22 )
 
+[node name="Tutorial banner" type="CanvasLayer" parent="."]
+
+[node name="TutorialBanner" type="Sprite" parent="Tutorial banner"]
+position = Vector2( 511.5, 298.5 )
+scale = Vector2( 1.00293, 1.01167 )
+texture = ExtResource( 26 )
+script = ExtResource( 31 )
+
+[node name="Button" type="Button" parent="Tutorial banner/TutorialBanner"]
+margin_left = -453.0
+margin_top = -5.0
+margin_right = -81.0
+margin_bottom = 72.0
+theme = ExtResource( 3 )
+text = "Lets start!"
+
 [connection signal="pressed" from="Pause menu 2/Pause menu/CenterContainer/VBoxContainer/Resume" to="Pause menu 2/Pause menu" method="_on_Resume_pressed"]
 [connection signal="pressed" from="Pause menu 2/Pause menu/CenterContainer/VBoxContainer/Quit" to="Pause menu 2/Pause menu" method="_on_Quit_pressed"]
 [connection signal="drag_ended" from="Pause menu 2/Pause menu/CenterContainer/VBoxContainer/HSlider" to="Pause menu 2/Pause menu/CenterContainer/VBoxContainer/HSlider" method="_on_HSlider_drag_ended"]
+[connection signal="pressed" from="Tutorial banner/TutorialBanner/Button" to="Tutorial banner/TutorialBanner" method="_on_Button_pressed"]
