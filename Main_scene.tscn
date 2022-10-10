@@ -1,4 +1,4 @@
-[gd_scene load_steps=43 format=2]
+[gd_scene load_steps=44 format=2]
 
 [ext_resource path="res://Player/Head.gd" type="Script" id=1]
 [ext_resource path="res://addons/zylann.scatter/scatter3d.gd" type="Script" id=2]
@@ -31,6 +31,10 @@
 [ext_resource path="res://addons/waterways/shaders/river.shader" type="Shader" id=29]
 [ext_resource path="res://addons/waterways/textures/water1_normal_bump.png" type="Texture" id=30]
 [ext_resource path="res://TutorialBanner.gd" type="Script" id=31]
+[ext_resource path="res://addons/zylann.hterrain/tools/icons/icon_detail_layer_node.svg" type="Texture" id=32]
+[ext_resource path="res://addons/zylann.hterrain/hterrain_detail_layer.gd" type="Script" id=33]
+[ext_resource path="res://Grass/grass_01/grass_01/diffus.dds" type="Texture" id=34]
+[ext_resource path="res://addons/SIsilicon.vfx.godrays/GodRays.gd" type="Script" id=35]
 
 [sub_resource type="Curve3D" id=26]
 bake_interval = 0.05
@@ -72,13 +76,6 @@ script = ExtResource( 18 )
 mode = 0
 textures = [ [ ExtResource( 25 ), ExtResource( 12 ), ExtResource( 8 ) ], [ ExtResource( 9 ), ExtResource( 13 ), ExtResource( 16 ) ] ]
 
-[sub_resource type="CubeMesh" id=8]
-
-[sub_resource type="Skin" id=7]
-
-[sub_resource type="BoxShape" id=9]
-extents = Vector3( 0.20084, 0.200657, 0.198686 )
-
 [sub_resource type="CapsuleMesh" id=4]
 
 [sub_resource type="CapsuleShape" id=5]
@@ -113,7 +110,7 @@ ground_color = Color( 0.3, 0.3, 0.3, 1 )
 sky_layers = 4
 sky_render_priority = -128
 horizon_level = 0.0
-sun_altitude = -41.865
+sun_altitude = -1.17
 sun_azimuth = 0.0
 sun_disk_color = Color( 0.996094, 0.541334, 0.140076, 1 )
 sun_disk_intensity = 2.0
@@ -198,7 +195,7 @@ script = ExtResource( 15 )
 dome_path = NodePath("..")
 system_sync = false
 total_cycle_in_minutes = 15.0
-total_hours = 14.791
+total_hours = 12.078
 day = 12
 month = 2
 year = 2021
@@ -211,11 +208,14 @@ utc = 0.0
 celestials_update_time = 0.0
 
 [node name="Sun" type="DirectionalLight" parent="."]
-transform = Transform( 0, -1, -1e-07, -0.667378, -7.44719e-08, 0.744719, -0.744719, 6.67378e-08, -0.667378, 0, 0.744719, -0.667378 )
-light_color = Color( 0.988318, 0.685122, 0.649082, 1 )
-light_energy = 0.744719
+transform = Transform( 0, -1, -1e-07, -0.020419, -9.99792e-08, 0.999792, -0.999792, 2.0419e-09, -0.020419, 0, 0.999792, -0.0204189 )
+light_color = Color( 0.984317, 0.788151, 0.788121, 1 )
+light_energy = 0.999791
 light_indirect_energy = 1.06
 shadow_enabled = true
+
+[node name="GodRays" type="Spatial" parent="Sun"]
+script = ExtResource( 35 )
 
 [node name="River" type="Spatial" parent="."]
 transform = Transform( 0.124589, 0, 0, 0, 0.124589, 0, 0, 0, 0.124589, 1401.47, 0, 1385.9 )
@@ -284,240 +284,242 @@ shader_params/u_depth_blending = true
 shader_params/u_triplanar = true
 shader_params/u_tile_reduction = Plane( 0, 0, 0, 0 )
 
+[node name="HTerrainDetailLayer" type="Spatial" parent="HTerrain"]
+script = ExtResource( 33 )
+__meta__ = {
+"_editor_icon": ExtResource( 32 )
+}
+texture = ExtResource( 34 )
+view_distance = 200.0
+density = 0.5
+shader_params/u_globalmap_tint_bottom = null
+shader_params/u_globalmap_tint_top = null
+shader_params/u_bottom_ao = null
+shader_params/u_instance_scale = Vector3( 5, 5, 5 )
+
 [node name="Forest" type="Spatial" parent="."]
 script = ExtResource( 2 )
 _scenes = [ ExtResource( 7 ), ExtResource( 24 ) ]
 
-[node name="Spatial" type="Spatial" parent="Forest" instance=ExtResource( 7 )]
+[node name="Spatial" parent="Forest" instance=ExtResource( 7 )]
 transform = Transform( 0.916823, 0, -0.399293, 0, 1, 0, 0.399293, 0, 0.916823, 560.759, -0.121399, 1820.21 )
 
-[node name="Spatial2" type="Spatial" parent="Forest" instance=ExtResource( 7 )]
+[node name="Spatial2" parent="Forest" instance=ExtResource( 7 )]
 transform = Transform( -0.375345, 0, -0.926885, 0, 1, 0, 0.926885, 0, -0.375345, 135.306, -6.10352e-05, 1820 )
 
-[node name="Spatial3" type="Spatial" parent="Forest" instance=ExtResource( 7 )]
+[node name="Spatial3" parent="Forest" instance=ExtResource( 7 )]
 transform = Transform( -0.58137, 0, 0.813639, 0, 1, 0, -0.813639, 0, -0.58137, 469.308, 0, 1534.88 )
 
-[node name="Spatial4" type="Spatial" parent="Forest" instance=ExtResource( 7 )]
+[node name="Spatial4" parent="Forest" instance=ExtResource( 7 )]
 transform = Transform( -0.749805, 0, -0.661659, 0, 1, 0, 0.661659, 0, -0.749805, 191.405, -0.00012207, 1520.86 )
 
-[node name="Spatial5" type="Spatial" parent="Forest" instance=ExtResource( 7 )]
+[node name="Spatial5" parent="Forest" instance=ExtResource( 7 )]
 transform = Transform( -0.89504, 0, 0.445985, 0, 1, 0, -0.445985, 0, -0.89504, 818.6, -6.10352e-05, 1863.71 )
 
-[node name="Spatial6" type="Spatial" parent="Forest" instance=ExtResource( 7 )]
+[node name="Spatial6" parent="Forest" instance=ExtResource( 7 )]
 transform = Transform( 0.0272369, 0, -0.999629, 0, 1, 0, 0.999629, 0, 0.0272369, 1162.2, 0, 1849.1 )
 
-[node name="Spatial7" type="Spatial" parent="Forest" instance=ExtResource( 7 )]
+[node name="Spatial7" parent="Forest" instance=ExtResource( 7 )]
 transform = Transform( 0.00359554, 0, -0.999994, 0, 1, 0, 0.999994, 0, 0.00359554, 1477.41, 6.10352e-05, 1857.41 )
 
-[node name="Spatial8" type="Spatial" parent="Forest" instance=ExtResource( 7 )]
+[node name="Spatial8" parent="Forest" instance=ExtResource( 7 )]
 transform = Transform( -0.957122, 0, 0.289684, 0, 1, 0, -0.289684, 0, -0.957122, 1760.92, 6.10352e-05, 1854.06 )
 
-[node name="Spatial9" type="Spatial" parent="Forest" instance=ExtResource( 7 )]
+[node name="Spatial9" parent="Forest" instance=ExtResource( 7 )]
 transform = Transform( 0.0381815, 0, -0.999271, 0, 1, 0, 0.999271, 0, 0.0381815, 2448.24, 6.10352e-05, 1855.77 )
 
-[node name="Spatial10" type="Spatial" parent="Forest" instance=ExtResource( 7 )]
+[node name="Spatial10" parent="Forest" instance=ExtResource( 7 )]
 transform = Transform( 0.0274377, 0, 0.999624, 0, 1, 0, -0.999624, 0, 0.0274377, 2067.36, 0, 1848.64 )
 
-[node name="Spatial11" type="Spatial" parent="Forest" instance=ExtResource( 7 )]
+[node name="Spatial11" parent="Forest" instance=ExtResource( 7 )]
 transform = Transform( -0.229284, 0, 0.97336, 0, 1, 0, -0.97336, 0, -0.229284, 1911.55, 0.00012207, 1658.66 )
 
-[node name="Spatial12" type="Spatial" parent="Forest" instance=ExtResource( 7 )]
+[node name="Spatial12" parent="Forest" instance=ExtResource( 7 )]
 transform = Transform( 0.218017, 0, -0.975945, 0, 1, 0, 0.975945, 0, 0.218017, 2203.22, 6.10352e-05, 1661.37 )
 
-[node name="Spatial13" type="Spatial" parent="Forest" instance=ExtResource( 7 )]
+[node name="Spatial13" parent="Forest" instance=ExtResource( 7 )]
 transform = Transform( 0.984135, 0, -0.177423, 0, 1, 0, 0.177423, 0, 0.984135, 2440.87, 6.10352e-05, 1504.01 )
 
-[node name="Spatial14" type="Spatial" parent="Forest" instance=ExtResource( 7 )]
+[node name="Spatial14" parent="Forest" instance=ExtResource( 7 )]
 transform = Transform( 0.533931, 0, 0.845528, 0, 1, 0, -0.845528, 0, 0.533931, 2129.04, 0.00012207, 1409.69 )
 
-[node name="Spatial15" type="Spatial" parent="Forest" instance=ExtResource( 7 )]
+[node name="Spatial15" parent="Forest" instance=ExtResource( 7 )]
 transform = Transform( -0.290198, 0, 0.956967, 0, 1, 0, -0.956967, 0, -0.290198, 2405.74, 6.10352e-05, 1196.87 )
 
-[node name="Spatial16" type="Spatial" parent="Forest" instance=ExtResource( 7 )]
+[node name="Spatial16" parent="Forest" instance=ExtResource( 7 )]
 transform = Transform( 0.703917, 0, 0.710283, 0, 1, 0, -0.710283, 0, 0.703917, 2147.35, -0.183472, 1073.48 )
 
-[node name="Spatial17" type="Spatial" parent="Forest" instance=ExtResource( 7 )]
+[node name="Spatial17" parent="Forest" instance=ExtResource( 7 )]
 transform = Transform( -0.907751, 0, 0.419509, 0, 1, 0, -0.419509, 0, -0.907751, 2449.88, 0.00012207, 915.412 )
 
-[node name="Spatial18" type="Spatial" parent="Forest" instance=ExtResource( 7 )]
+[node name="Spatial18" parent="Forest" instance=ExtResource( 7 )]
 transform = Transform( 0.937808, 0, -0.347155, 0, 1, 0, 0.347155, 0, 0.937808, 2104.3, -0.000305176, 760.38 )
 
-[node name="Spatial19" type="Spatial" parent="Forest" instance=ExtResource( 7 )]
+[node name="Spatial19" parent="Forest" instance=ExtResource( 7 )]
 transform = Transform( 0.68125, 0, -0.732051, 0, 1, 0, 0.732051, 0, 0.68125, 2421.15, 0.00012207, 515.659 )
 
-[node name="Spatial20" type="Spatial" parent="Forest" instance=ExtResource( 7 )]
+[node name="Spatial20" parent="Forest" instance=ExtResource( 7 )]
 transform = Transform( -0.206586, 0, -0.978428, 0, 1, 0, 0.978428, 0, -0.206586, 2076.12, 0, 365.689 )
 
-[node name="Spatial21" type="Spatial" parent="Forest" instance=ExtResource( 7 )]
+[node name="Spatial21" parent="Forest" instance=ExtResource( 7 )]
 transform = Transform( 0.704885, 0, 0.709322, 0, 1, 0, -0.709322, 0, 0.704885, 106.807, 0.00012207, 1208.32 )
 
-[node name="Spatial22" type="Spatial" parent="Forest" instance=ExtResource( 7 )]
+[node name="Spatial22" parent="Forest" instance=ExtResource( 7 )]
 transform = Transform( -0.839422, 0, -0.543481, 0, 1, 0, 0.543481, 0, -0.839422, 475.768, -0.000488281, 1279.65 )
 
-[node name="Spatial23" type="Spatial" parent="Forest" instance=ExtResource( 7 )]
+[node name="Spatial23" parent="Forest" instance=ExtResource( 7 )]
 transform = Transform( -0.711463, 0, -0.702724, 0, 1, 0, 0.702724, 0, -0.711463, 327.513, 0, 992.671 )
 
-[node name="Spatial24" type="Spatial" parent="Forest" instance=ExtResource( 7 )]
+[node name="Spatial24" parent="Forest" instance=ExtResource( 7 )]
 transform = Transform( -0.875776, 0, -0.482718, 0, 1, 0, 0.482718, 0, -0.875776, 154.664, -6.10352e-05, 795.574 )
 
-[node name="Spatial25" type="Spatial" parent="Forest" instance=ExtResource( 7 )]
+[node name="Spatial25" parent="Forest" instance=ExtResource( 7 )]
 transform = Transform( 0.805284, 0, 0.59289, 0, 1, 0, -0.59289, 0, 0.805284, 530.858, -0.000183105, 797.836 )
 
-[node name="Spatial26" type="Spatial" parent="Forest" instance=ExtResource( 7 )]
+[node name="Spatial26" parent="Forest" instance=ExtResource( 7 )]
 transform = Transform( 0.853025, 0, -0.52187, 0, 1, 0, 0.52187, 0, 0.853025, 103.813, -0.00628662, 438.64 )
 
-[node name="Spatial27" type="Spatial" parent="Forest" instance=ExtResource( 7 )]
+[node name="Spatial27" parent="Forest" instance=ExtResource( 7 )]
 transform = Transform( -0.515908, 0, 0.856644, 0, 1, 0, -0.856644, 0, -0.515908, 303.177, -0.00646973, 585.532 )
 
-[node name="Spatial28" type="Spatial" parent="Forest" instance=ExtResource( 7 )]
+[node name="Spatial28" parent="Forest" instance=ExtResource( 7 )]
 transform = Transform( -0.835296, 0, -0.549801, 0, 1, 0, 0.549801, 0, -0.835296, 482.239, 0, 375.337 )
 
-[node name="Spatial29" type="Spatial" parent="Forest" instance=ExtResource( 7 )]
+[node name="Spatial29" parent="Forest" instance=ExtResource( 7 )]
 transform = Transform( -0.115161, 0, 0.993347, 0, 1, 0, -0.993347, 0, -0.115161, 1693.15, -0.00012207, 251.022 )
 
-[node name="Spatial30" type="Spatial" parent="Forest" instance=ExtResource( 7 )]
+[node name="Spatial30" parent="Forest" instance=ExtResource( 7 )]
 transform = Transform( 0.854964, 0, -0.518687, 0, 1, 0, 0.518687, 0, 0.854964, 1685.48, 0.00146484, 550.331 )
 
-[node name="Spatial31" type="Spatial" parent="Forest" instance=ExtResource( 7 )]
+[node name="Spatial31" parent="Forest" instance=ExtResource( 7 )]
 transform = Transform( -0.941167, 0, -0.337941, 0, 1, 0, 0.337941, 0, -0.941167, 1317.82, -0.00012207, 679.943 )
 
-[node name="Spatial32" type="Spatial" parent="Forest" instance=ExtResource( 7 )]
+[node name="Spatial32" parent="Forest" instance=ExtResource( 7 )]
 transform = Transform( -0.985507, 0, 0.169636, 0, 1, 0, -0.169636, 0, -0.985507, 1331.25, -6.10352e-05, 229.07 )
 
-[node name="Spatial33" type="Spatial" parent="Forest" instance=ExtResource( 7 )]
+[node name="Spatial33" parent="Forest" instance=ExtResource( 7 )]
 transform = Transform( -0.831768, 0, -0.555123, 0, 1, 0, 0.555123, 0, -0.831768, 858.004, 0.00183105, 167.977 )
 
-[node name="Spatial34" type="Spatial" parent="Forest" instance=ExtResource( 7 )]
+[node name="Spatial34" parent="Forest" instance=ExtResource( 7 )]
 transform = Transform( 0.509602, 0, -0.86041, 0, 1, 0, 0.86041, 0, 0.509602, 742.025, -6.10352e-05, 588.442 )
 
-[node name="Spatial35" type="Spatial" parent="Forest" instance=ExtResource( 7 )]
+[node name="Spatial35" parent="Forest" instance=ExtResource( 7 )]
 transform = Transform( 0.954812, 0, 0.297212, 0, 1, 0, -0.297212, 0, 0.954812, 1133.64, -6.10352e-05, 504.571 )
 
-[node name="Spatial36" type="Spatial" parent="Forest" instance=ExtResource( 7 )]
+[node name="Spatial36" parent="Forest" instance=ExtResource( 7 )]
 transform = Transform( 0.670488, 0, -0.74192, 0, 1, 0, 0.74192, 0, 0.670488, 916.656, -6.10352e-05, 675.725 )
 
-[node name="Spatial37" type="Spatial" parent="Forest" instance=ExtResource( 7 )]
+[node name="Spatial37" parent="Forest" instance=ExtResource( 7 )]
 transform = Transform( 0.801721, 0, -0.597699, 0, 1, 0, 0.597699, 0, 0.801721, 2360.14, 0.000244141, 151.121 )
 
-[node name="Spatial38" type="Spatial" parent="Forest" instance=ExtResource( 7 )]
+[node name="Spatial38" parent="Forest" instance=ExtResource( 7 )]
 transform = Transform( 0.548397, 0, 0.836218, 0, 1, 0, -0.836218, 0, 0.548397, 811.292, 0.00012207, 330.271 )
 
-[node name="Spatial39" type="Spatial" parent="Forest" instance=ExtResource( 7 )]
+[node name="Spatial39" parent="Forest" instance=ExtResource( 7 )]
 transform = Transform( -0.00908164, 0, -0.999959, 0, 1, 0, 0.999959, 0, -0.00908164, 1890.73, 0, 110.26 )
 
-[node name="Spatial40" type="Spatial" parent="Forest" instance=ExtResource( 24 )]
+[node name="Spatial40" parent="Forest" instance=ExtResource( 24 )]
 transform = Transform( 0.849706, 0, -0.527256, 0, 1, 0, 0.527256, 0, 0.849706, 1524.28, -6.10352e-05, 405.86 )
 
-[node name="Spatial41" type="Spatial" parent="Forest" instance=ExtResource( 24 )]
+[node name="Spatial41" parent="Forest" instance=ExtResource( 24 )]
 transform = Transform( 0.989044, 0, -0.147623, 0, 1, 0, 0.147623, 0, 0.989044, 1554.24, 0, 60.007 )
 
-[node name="Spatial42" type="Spatial" parent="Forest" instance=ExtResource( 24 )]
+[node name="Spatial42" parent="Forest" instance=ExtResource( 24 )]
 transform = Transform( 0.989304, 0, -0.145871, 0, 1, 0, 0.145871, 0, 0.989304, 940.461, -0.013916, 383.442 )
 
-[node name="Spatial43" type="Spatial" parent="Forest" instance=ExtResource( 24 )]
+[node name="Spatial43" parent="Forest" instance=ExtResource( 24 )]
 transform = Transform( 0.148695, 0, 0.988883, 0, 1, 0, -0.988883, 0, 0.148695, 339.091, -6.10352e-05, 1240.17 )
 
-[node name="Spatial44" type="Spatial" parent="Forest" instance=ExtResource( 24 )]
+[node name="Spatial44" parent="Forest" instance=ExtResource( 24 )]
 transform = Transform( 0.991321, 0, 0.131466, 0, 1, 0, -0.131466, 0, 0.991321, 258.317, 0, 1714.18 )
 
-[node name="Spatial45" type="Spatial" parent="Forest" instance=ExtResource( 24 )]
+[node name="Spatial45" parent="Forest" instance=ExtResource( 24 )]
 transform = Transform( 0.715751, 0, -0.698355, 0, 1, 0, 0.698355, 0, 0.715751, 2014.87, 6.10352e-05, 1265.82 )
 
-[node name="Spatial46" type="Spatial" parent="Forest" instance=ExtResource( 7 )]
+[node name="Spatial46" parent="Forest" instance=ExtResource( 7 )]
 transform = Transform( 0.99772, 0, 0.0674865, 0, 1, 0, -0.0674865, 0, 0.99772, 1851.99, 0, 854.007 )
 
-[node name="Spatial47" type="Spatial" parent="Forest" instance=ExtResource( 24 )]
+[node name="Spatial47" parent="Forest" instance=ExtResource( 24 )]
 transform = Transform( 0.166436, 0, -0.986052, 0, 1, 0, 0.986052, 0, 0.166436, 1978.84, 6.10352e-05, 622.58 )
 
-[node name="Spatial48" type="Spatial" parent="Forest" instance=ExtResource( 24 )]
+[node name="Spatial48" parent="Forest" instance=ExtResource( 24 )]
 transform = Transform( -0.959817, 0, 0.280627, 0, 1, 0, -0.280627, 0, -0.959817, 2293.96, 6.10352e-05, 385.618 )
 
-[node name="Spatial49" type="Spatial" parent="Forest" instance=ExtResource( 7 )]
+[node name="Spatial49" parent="Forest" instance=ExtResource( 7 )]
 transform = Transform( 0.840127, 0, 0.54239, 0, 1, 0, -0.54239, 0, 0.840127, 545.662, 0.00012207, 88.9525 )
 
-[node name="Spatial50" type="Spatial" parent="Forest" instance=ExtResource( 7 )]
+[node name="Spatial50" parent="Forest" instance=ExtResource( 7 )]
 transform = Transform( -0.833534, 0, 0.552468, 0, 1, 0, -0.552468, 0, -0.833534, 151.2, 0.00012207, 113.636 )
 
 [node name="Mountain" type="Spatial" parent="."]
 script = ExtResource( 2 )
 _scenes = [ ExtResource( 7 ), ExtResource( 24 ) ]
 
-[node name="Spatial" type="Spatial" parent="Mountain" instance=ExtResource( 7 )]
+[node name="Spatial" parent="Mountain" instance=ExtResource( 7 )]
 transform = Transform( 0.38893, 0, -0.921267, 0, 1, 0, 0.921267, 0, 0.38893, 2422.64, 141.901, 2300.27 )
 
-[node name="Spatial2" type="Spatial" parent="Mountain" instance=ExtResource( 7 )]
+[node name="Spatial2" parent="Mountain" instance=ExtResource( 7 )]
 transform = Transform( -0.900098, 0, -0.435687, 0, 1, 0, 0.435687, 0, -0.900098, 2268.08, 91.1157, 2228.59 )
 
-[node name="Spatial3" type="Spatial" parent="Mountain" instance=ExtResource( 7 )]
+[node name="Spatial3" parent="Mountain" instance=ExtResource( 7 )]
 transform = Transform( 0.176829, 0, -0.984242, 0, 1, 0, 0.984242, 0, 0.176829, 2135.42, 117.499, 2290.52 )
 
-[node name="Spatial4" type="Spatial" parent="Mountain" instance=ExtResource( 7 )]
+[node name="Spatial4" parent="Mountain" instance=ExtResource( 7 )]
 transform = Transform( -0.0190541, 0, 0.999818, 0, 1, 0, -0.999818, 0, -0.0190541, 1946.86, 120.695, 2293.82 )
 
-[node name="Spatial5" type="Spatial" parent="Mountain" instance=ExtResource( 7 )]
+[node name="Spatial5" parent="Mountain" instance=ExtResource( 7 )]
 transform = Transform( 0.0219387, 0, 0.999759, 0, 1, 0, -0.999759, 0, 0.0219387, 2027.86, 92.4822, 2221.79 )
 
-[node name="Spatial6" type="Spatial" parent="Mountain" instance=ExtResource( 7 )]
+[node name="Spatial6" parent="Mountain" instance=ExtResource( 7 )]
 transform = Transform( 0.00581781, 0, 0.999983, 0, 1, 0, -0.999983, 0, 0.00581781, 1754.29, 106.089, 2250.08 )
 
-[node name="Spatial7" type="Spatial" parent="Mountain" instance=ExtResource( 7 )]
+[node name="Spatial7" parent="Mountain" instance=ExtResource( 7 )]
 transform = Transform( 0.677254, 0, -0.735749, 0, 1, 0, 0.735749, 0, 0.677254, 1836.06, 85.4363, 2207.39 )
 
-[node name="Spatial8" type="Spatial" parent="Mountain" instance=ExtResource( 7 )]
+[node name="Spatial8" parent="Mountain" instance=ExtResource( 7 )]
 transform = Transform( -0.68904, 0, -0.724723, 0, 1, 0, 0.724723, 0, -0.68904, 1637.13, 89.4865, 2206.59 )
 
-[node name="Spatial9" type="Spatial" parent="Mountain" instance=ExtResource( 7 )]
+[node name="Spatial9" parent="Mountain" instance=ExtResource( 7 )]
 transform = Transform( 0.664583, 0, -0.747215, 0, 1, 0, 0.747215, 0, 0.664583, 1511.44, 93.0421, 2203.19 )
 
-[node name="Spatial10" type="Spatial" parent="Mountain" instance=ExtResource( 7 )]
+[node name="Spatial10" parent="Mountain" instance=ExtResource( 7 )]
 transform = Transform( -0.98488, 0, -0.173236, 0, 1, 0, 0.173236, 0, -0.98488, 1340.92, 102.731, 2230.51 )
 
-[node name="Spatial11" type="Spatial" parent="Mountain" instance=ExtResource( 7 )]
+[node name="Spatial11" parent="Mountain" instance=ExtResource( 7 )]
 transform = Transform( -0.63041, 0, 0.776262, 0, 1, 0, -0.776262, 0, -0.63041, 1179.39, 99.2048, 2218.65 )
 
-[node name="Spatial12" type="Spatial" parent="Mountain" instance=ExtResource( 7 )]
+[node name="Spatial12" parent="Mountain" instance=ExtResource( 7 )]
 transform = Transform( 0.576524, 0, -0.81708, 0, 1, 0, 0.81708, 0, 0.576524, 1019.12, 98.1987, 2205.65 )
 
-[node name="Spatial13" type="Spatial" parent="Mountain" instance=ExtResource( 7 )]
+[node name="Spatial13" parent="Mountain" instance=ExtResource( 7 )]
 transform = Transform( 0.973388, 0, -0.229162, 0, 1, 0, 0.229162, 0, 0.973388, 762.035, 99.2844, 2203.64 )
 
-[node name="Spatial14" type="Spatial" parent="Mountain" instance=ExtResource( 7 )]
+[node name="Spatial14" parent="Mountain" instance=ExtResource( 7 )]
 transform = Transform( 0.35508, 0, -0.934836, 0, 1, 0, 0.934836, 0, 0.35508, 578.634, 98.4409, 2229.18 )
 
-[node name="Spatial15" type="Spatial" parent="Mountain" instance=ExtResource( 7 )]
+[node name="Spatial15" parent="Mountain" instance=ExtResource( 7 )]
 transform = Transform( -0.696623, 0, 0.717437, 0, 1, 0, -0.717437, 0, -0.696623, 377.772, 98.7992, 2261.11 )
 
-[node name="Spatial16" type="Spatial" parent="Mountain" instance=ExtResource( 7 )]
+[node name="Spatial16" parent="Mountain" instance=ExtResource( 7 )]
 transform = Transform( -0.217915, 0, -0.975968, 0, 1, 0, 0.975968, 0, -0.217915, 188.443, 99.8677, 2140.58 )
 
-[node name="Spatial17" type="Spatial" parent="Mountain" instance=ExtResource( 7 )]
+[node name="Spatial17" parent="Mountain" instance=ExtResource( 7 )]
 transform = Transform( -0.246905, 0, -0.96904, 0, 1, 0, 0.96904, 0, -0.246905, 201.873, 99.9479, 2260.83 )
 
-[node name="Spatial18" type="Spatial" parent="Mountain" instance=ExtResource( 24 )]
+[node name="Spatial18" parent="Mountain" instance=ExtResource( 24 )]
 transform = Transform( 0.955613, 0, -0.294625, 0, 1, 0, 0.294625, 0, 0.955613, 357.478, 99.9999, 2184.68 )
 
-[node name="Spatial19" type="Spatial" parent="Mountain" instance=ExtResource( 24 )]
+[node name="Spatial19" parent="Mountain" instance=ExtResource( 24 )]
 transform = Transform( 0.606729, 0, 0.794909, 0, 1, 0, -0.794909, 0, 0.606729, 916.601, 100.222, 2228.33 )
 
-[node name="Spatial20" type="Spatial" parent="Mountain" instance=ExtResource( 24 )]
+[node name="Spatial20" parent="Mountain" instance=ExtResource( 24 )]
 transform = Transform( -0.712683, 0, -0.701486, 0, 1, 0, 0.701486, 0, -0.712683, 1598.97, 120.566, 2293.09 )
 
-[node name="Spatial21" type="Spatial" parent="Mountain" instance=ExtResource( 24 )]
+[node name="Spatial21" parent="Mountain" instance=ExtResource( 24 )]
 transform = Transform( 0.198927, 0, -0.980014, 0, 1, 0, 0.980014, 0, 0.198927, 1253.14, 106.691, 2263.39 )
 
-[node name="Spatial22" type="Spatial" parent="Mountain" instance=ExtResource( 7 )]
+[node name="Spatial22" parent="Mountain" instance=ExtResource( 7 )]
 transform = Transform( -0.396872, 0, -0.917874, 0, 1, 0, 0.917874, 0, -0.396872, 2471.94, 94.1693, 2213.61 )
-
-[node name="MeshInstance" type="MeshInstance" parent="."]
-transform = Transform( 10, 0, 0, 0, 10, 0, 0, 0, 10, 230.387, 10.0539, 273.358 )
-mesh = SubResource( 8 )
-skin = SubResource( 7 )
-
-[node name="StaticBody" type="StaticBody" parent="MeshInstance"]
-transform = Transform( 5, 0, 0, 0, 5, 0, 0, 0, 5, 0, 0, 0 )
-
-[node name="CollisionShape" type="CollisionShape" parent="MeshInstance/StaticBody"]
-shape = SubResource( 9 )
 
 [node name="ReflectionProbe" type="ReflectionProbe" parent="."]
 transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 1313.39, 0, 1115.07 )
@@ -526,7 +528,7 @@ origin_offset = Vector3( 0, 0, 1387.36 )
 box_projection = true
 
 [node name="Player" type="KinematicBody" parent="."]
-transform = Transform( 1, 0, 0, 0, -4.37114e-08, 1, 0, -1, -4.37114e-08, 1256.37, 86.6163, 2010.93 )
+transform = Transform( 0.998948, -0.0458686, -2.00498e-09, 0, -4.37114e-08, 1, -0.0458686, -0.998948, -4.36654e-08, 171.985, 5, 60.426 )
 script = ExtResource( 1 )
 
 [node name="MeshInstance" type="MeshInstance" parent="Player"]
