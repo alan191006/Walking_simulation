@@ -14,7 +14,7 @@ export var acceleration := 8
 export var deceleration := 10
 var direction := Vector3()
 var rot := Vector3()
-export var speed := 2000
+export var speed := 200
 var input_axis := Vector2()
 var velocity := Vector3()
 var up_direction := Vector3.UP
@@ -27,7 +27,7 @@ var score: int = 0
 # physics
 var moveSpeed : float = 100
 var jumpForce : float = 10.0
-var gravity : float = 1000.0
+var gravity : float = 800.0
 
 # cam look
 var minLookAngle : float = 0.0
@@ -105,9 +105,9 @@ func _input(event):
 		mouseDelta = event.relative
 	
 	if event.is_action_pressed("sprint"):
-		speed = 4000
+		speed = 200
 	else:
-		speed = 500
+		speed = 100
 		
 
 

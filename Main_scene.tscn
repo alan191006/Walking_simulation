@@ -1,4 +1,4 @@
-[gd_scene load_steps=44 format=2]
+[gd_scene load_steps=45 format=2]
 
 [ext_resource path="res://Player/Head.gd" type="Script" id=1]
 [ext_resource path="res://addons/zylann.scatter/scatter3d.gd" type="Script" id=2]
@@ -31,7 +31,10 @@
 [ext_resource path="res://addons/waterways/shaders/river.shader" type="Shader" id=29]
 [ext_resource path="res://addons/waterways/textures/water1_normal_bump.png" type="Texture" id=30]
 [ext_resource path="res://TutorialBanner.gd" type="Script" id=31]
-[ext_resource path="res://snake2.tscn" type="PackedScene" id=32]
+[ext_resource path="res://addons/zylann.hterrain/tools/icons/icon_detail_layer_node.svg" type="Texture" id=32]
+[ext_resource path="res://addons/zylann.hterrain/hterrain_detail_layer.gd" type="Script" id=33]
+[ext_resource path="res://Grass/grass_01/grass_01/diffus.dds" type="Texture" id=34]
+[ext_resource path="res://addons/SIsilicon.vfx.godrays/GodRays.gd" type="Script" id=35]
 
 [sub_resource type="Curve3D" id=26]
 bake_interval = 0.05
@@ -73,13 +76,6 @@ script = ExtResource( 18 )
 mode = 0
 textures = [ [ ExtResource( 25 ), ExtResource( 12 ), ExtResource( 8 ) ], [ ExtResource( 9 ), ExtResource( 13 ), ExtResource( 16 ) ] ]
 
-[sub_resource type="CubeMesh" id=8]
-
-[sub_resource type="Skin" id=7]
-
-[sub_resource type="BoxShape" id=9]
-extents = Vector3( 0.20084, 0.200657, 0.198686 )
-
 [sub_resource type="CapsuleMesh" id=4]
 
 [sub_resource type="CapsuleShape" id=5]
@@ -102,6 +98,9 @@ ssao_edge_sharpness = 12.95
 
 [sub_resource type="Theme" id=25]
 
+[sub_resource type="BoxShape" id=28]
+extents = Vector3( 1278.61, 719.181, 1 )
+
 [node name="Main_scene" type="Spatial"]
 
 [node name="Skydome" type="Node" parent="."]
@@ -114,7 +113,7 @@ ground_color = Color( 0.3, 0.3, 0.3, 1 )
 sky_layers = 4
 sky_render_priority = -128
 horizon_level = 0.0
-sun_altitude = -41.865
+sun_altitude = -1.17
 sun_azimuth = 0.0
 sun_disk_color = Color( 0.996094, 0.541334, 0.140076, 1 )
 sun_disk_intensity = 2.0
@@ -199,7 +198,7 @@ script = ExtResource( 15 )
 dome_path = NodePath("..")
 system_sync = false
 total_cycle_in_minutes = 15.0
-total_hours = 14.791
+total_hours = 12.078
 day = 12
 month = 2
 year = 2021
@@ -212,14 +211,17 @@ utc = 0.0
 celestials_update_time = 0.0
 
 [node name="Sun" type="DirectionalLight" parent="."]
-transform = Transform( 0, -1, -1e-07, -0.667378, -7.44719e-08, 0.744719, -0.744719, 6.67378e-08, -0.667378, 0, 0.744719, -0.667378 )
-light_color = Color( 0.988318, 0.685122, 0.649082, 1 )
-light_energy = 0.744719
+transform = Transform( 0, -1, -1e-07, -0.020419, -9.99792e-08, 0.999792, -0.999792, 2.0419e-09, -0.020419, 0, 0.999792, -0.0204189 )
+light_color = Color( 0.984317, 0.788151, 0.788121, 1 )
+light_energy = 0.999791
 light_indirect_energy = 1.06
 shadow_enabled = true
 
+[node name="GodRays" type="Spatial" parent="Sun"]
+script = ExtResource( 35 )
+
 [node name="River" type="Spatial" parent="."]
-transform = Transform( 0.124589, 0, 0, 0, 0.124589, 0, 0, 0, 0.124589, 1401.47, 0, 1385.9 )
+transform = Transform( 0.124589, 0, 0, 0, 0.124589, 0, 0, 0, 0.124589, 1401.47, 0, 1314.04 )
 script = ExtResource( 28 )
 shape_step_length_divs = 1
 shape_step_width_divs = 1
@@ -265,9 +267,6 @@ _material = SubResource( 27 )
 _selected_shader = 0
 _uv2_sides = 0
 
-[node name="Spatial" parent="River" instance=ExtResource( 32 )]
-transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -9153.86, 305.003, -7447.69 )
-
 [node name="HTerrain" type="Spatial" parent="."]
 script = ExtResource( 6 )
 ambient_wind = 0.2
@@ -287,6 +286,19 @@ shader_params/u_ground_uv_scale = 20
 shader_params/u_depth_blending = true
 shader_params/u_triplanar = true
 shader_params/u_tile_reduction = Plane( 0, 0, 0, 0 )
+
+[node name="HTerrainDetailLayer" type="Spatial" parent="HTerrain"]
+script = ExtResource( 33 )
+__meta__ = {
+"_editor_icon": ExtResource( 32 )
+}
+texture = ExtResource( 34 )
+view_distance = 500.0
+density = 0.5
+shader_params/u_globalmap_tint_bottom = null
+shader_params/u_globalmap_tint_top = null
+shader_params/u_bottom_ao = null
+shader_params/u_instance_scale = Vector3( 5, 5, 5 )
 
 [node name="Forest" type="Spatial" parent="."]
 script = ExtResource( 2 )
@@ -512,17 +524,6 @@ transform = Transform( 0.198927, 0, -0.980014, 0, 1, 0, 0.980014, 0, 0.198927, 1
 [node name="Spatial22" parent="Mountain" instance=ExtResource( 7 )]
 transform = Transform( -0.396872, 0, -0.917874, 0, 1, 0, 0.917874, 0, -0.396872, 2471.94, 94.1693, 2213.61 )
 
-[node name="MeshInstance" type="MeshInstance" parent="."]
-transform = Transform( 10, 0, 0, 0, 10, 0, 0, 0, 10, 230.387, 10.0539, 273.358 )
-mesh = SubResource( 8 )
-skin = SubResource( 7 )
-
-[node name="StaticBody" type="StaticBody" parent="MeshInstance"]
-transform = Transform( 5, 0, 0, 0, 5, 0, 0, 0, 5, 0, 0, 0 )
-
-[node name="CollisionShape" type="CollisionShape" parent="MeshInstance/StaticBody"]
-shape = SubResource( 9 )
-
 [node name="ReflectionProbe" type="ReflectionProbe" parent="."]
 transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 1313.39, 0, 1115.07 )
 extents = Vector3( 1370.03, 1299.02, 1698.59 )
@@ -530,8 +531,9 @@ origin_offset = Vector3( 0, 0, 1387.36 )
 box_projection = true
 
 [node name="Player" type="KinematicBody" parent="."]
-transform = Transform( 1, 0, 0, 0, -4.37114e-08, 1, 0, -1, -4.37114e-08, 1256.37, 86.6163, 2010.93 )
+transform = Transform( 0.998948, -0.0458686, -2.00498e-09, 0, -4.37114e-08, 1, -0.0458686, -0.998948, -4.36654e-08, 171.985, 5, 60.426 )
 script = ExtResource( 1 )
+jump_height = 200
 
 [node name="MeshInstance" type="MeshInstance" parent="Player"]
 transform = Transform( 5, 0, 0, 0, 5, 0, 0, 0, 5, 1, 1, 1 )
@@ -637,12 +639,12 @@ autoplay = true
 [node name="Venomous" type="Node" parent="Snakes"]
 
 [node name="Venomous_snake" parent="Snakes/Venomous" instance=ExtResource( 21 )]
-transform = Transform( 25, 0, 0, 0, 25, 0, 0, 0, 25, 214, 1, 402.124 )
+transform = Transform( 5, 0, 0, 0, 5, 0, 0, 0, 5, 214, 0, 402.124 )
 
 [node name="Non-venomous" type="Node" parent="Snakes"]
 
 [node name="Non-venomous_snake" parent="Snakes/Non-venomous" instance=ExtResource( 21 )]
-transform = Transform( 25, 0, 0, 0, 25, 0, 0, 0, 25, 127.901, 1, 1241.97 )
+transform = Transform( 5, 0, 0, 0, 5, 0, 0, 0, 5, 127.901, 0, 1241.97 )
 script = ExtResource( 22 )
 
 [node name="Tutorial banner" type="CanvasLayer" parent="."]
@@ -660,6 +662,35 @@ margin_right = -81.0
 margin_bottom = 72.0
 theme = ExtResource( 3 )
 text = "Lets start!"
+
+[node name="Limits" type="Node" parent="."]
+
+[node name="L1" type="StaticBody" parent="Limits"]
+
+[node name="CollisionShape" type="CollisionShape" parent="Limits/L1"]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 1276.87, 0, 0 )
+shape = SubResource( 28 )
+
+[node name="L2" type="StaticBody" parent="Limits"]
+transform = Transform( 1.02284, 0, 0, 0, 1, 0, 0, 0, 1, -51.0745, 0, 2559.15 )
+
+[node name="CollisionShape" type="CollisionShape" parent="Limits/L2"]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 1276.87, 0, 0 )
+shape = SubResource( 28 )
+
+[node name="L3" type="StaticBody" parent="Limits"]
+transform = Transform( -0.0190927, 0, -0.999818, 0, 1, 0, 0.999818, 0, -0.0190927, -0.0377045, 0, 2.59519 )
+
+[node name="CollisionShape" type="CollisionShape" parent="Limits/L3"]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 1276.87, 0, 0 )
+shape = SubResource( 28 )
+
+[node name="L4" type="StaticBody" parent="Limits"]
+transform = Transform( -4.37114e-08, 0, -1, 0, 1, 0, 1, 0, -4.37114e-08, 2560.59, 0, 0 )
+
+[node name="CollisionShape" type="CollisionShape" parent="Limits/L4"]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 1276.87, 0, 0 )
+shape = SubResource( 28 )
 
 [connection signal="pressed" from="Pause menu 2/Pause menu/CenterContainer/VBoxContainer/Resume" to="Pause menu 2/Pause menu" method="_on_Resume_pressed"]
 [connection signal="pressed" from="Pause menu 2/Pause menu/CenterContainer/VBoxContainer/Quit" to="Pause menu 2/Pause menu" method="_on_Quit_pressed"]
