@@ -8,7 +8,7 @@ enum {
 
 var state = IDLE
 
-var moveSpeed  : float = 20.0
+var moveSpeed  : float = 100.0
 var visionDist : float = 30.0
 var attackDist : float = 15.0
 

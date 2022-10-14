@@ -9,6 +9,11 @@
 config_version=4
 
 _global_script_classes=[ {
+"base": "Reference",
+"class": "DateTimeUtil",
+"language": "GDScript",
+"path": "res://addons/jc.godot.time-of-day/Code/TimeOfDay/DateTime/DateTimeUtil.gd"
+}, {
 "base": "ResourceFormatLoader",
 "class": "HTerrainDataLoader",
 "language": "GDScript",
@@ -23,16 +28,59 @@ _global_script_classes=[ {
 "class": "MovementController",
 "language": "GDScript",
 "path": "res://Player/MovementController.gd"
+}, {
+"base": "Reference",
+"class": "OrbitalElements",
+"language": "GDScript",
+"path": "res://addons/jc.godot.time-of-day/Code/TimeOfDay/OrbitalElements.gd"
+}, {
+"base": "Reference",
+"class": "ScatterLib",
+"language": "GDScript",
+"path": "res://addons/jc.godot.time-of-day/Code/Sky/ScatterLib.gd"
+}, {
+"base": "Reference",
+"class": "SkyConst",
+"language": "GDScript",
+"path": "res://addons/jc.godot.time-of-day/Code/Sky/SkyConstants.gd"
+}, {
+"base": "Node",
+"class": "Skydome",
+"language": "GDScript",
+"path": "res://addons/jc.godot.time-of-day/Code/Sky/Skydome.gd"
+}, {
+"base": "Resource",
+"class": "SkydomeResources",
+"language": "GDScript",
+"path": "res://addons/jc.godot.time-of-day/Code/Sky/SkydomeResources.gd"
+}, {
+"base": "Reference",
+"class": "TOD_Math",
+"language": "GDScript",
+"path": "res://addons/jc.godot.time-of-day/Code/Util/TOD_Math.gd"
+}, {
+"base": "Node",
+"class": "TimeOfDay",
+"language": "GDScript",
+"path": "res://addons/jc.godot.time-of-day/Code/TimeOfDay/TimeOfDay.gd"
 } ]
 _global_script_class_icons={
+"DateTimeUtil": "",
 "HTerrainDataLoader": "",
 "HTerrainDataSaver": "",
-"MovementController": ""
+"MovementController": "",
+"OrbitalElements": "",
+"ScatterLib": "",
+"SkyConst": "",
+"Skydome": "",
+"SkydomeResources": "",
+"TOD_Math": "",
+"TimeOfDay": ""
 }
 
 [application]
 
-config/name="Test"
+config/name="Walking Simulation"
 run/main_scene="res://Main_scene.tscn"
 config/icon="res://icon.png"
 
@@ -43,7 +91,7 @@ window/per_pixel_transparency/enabled=true
 
 [editor_plugins]
 
-enabled=PoolStringArray( "res://addons/GodRays/SIsilicon.vfx.godrays/plugin.cfg", "res://addons/waterways/plugin.cfg", "res://addons/zylann.hterrain/plugin.cfg", "res://addons/zylann.scatter/plugin.cfg" )
+enabled=PoolStringArray( "res://addons/zylann.hterrain/plugin.cfg", "res://addons/zylann.scatter/plugin.cfg" )
 
 [gui]
 
@@ -88,7 +136,7 @@ cheat_code_green={
 }
 book={
 "deadzone": 0.5,
-"events": [ Object(InputEventKey,"resource_local_to_scene":false,"resource_name":"","device":0,"alt":false,"shift":false,"control":false,"meta":false,"command":false,"pressed":false,"scancode":0,"physical_scancode":69,"unicode":0,"echo":false,"script":null)
+"events": [ Object(InputEventKey,"resource_local_to_scene":false,"resource_name":"","device":0,"alt":false,"shift":false,"control":false,"meta":false,"command":false,"pressed":false,"scancode":0,"physical_scancode":81,"unicode":0,"echo":false,"script":null)
  ]
 }
 interact={

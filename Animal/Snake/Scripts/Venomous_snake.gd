@@ -7,8 +7,8 @@ enum {
 
 var state = IDLE
 
-var moveSpeed  : float = 20.0
-var visionDist : float = 30.0
+var moveSpeed  : float = 100.0
+var visionDist : float = 100.0
 # Snakes/Venomous/Venomous_snake
 var gravity_multiplier : float = 3.0
 

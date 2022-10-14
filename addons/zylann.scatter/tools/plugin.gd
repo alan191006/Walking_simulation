@@ -2,28 +2,26 @@ tool
 extends EditorPlugin
 
 const Scatter3D = preload("res://addons/zylann.scatter/scatter3d.gd")
-const PaletteScene = preload("res://addons/zylann.scatter/tools/palette.tscn")
-const Palette = preload("./palette.gd")
-const Util = preload("../util/util.gd")
-const Logger = preload("../util/logger.gd")
+const PaletteControl = preload("res://addons/zylann.scatter/tools/palette.tscn")
+const Util = preload("res://addons/zylann.scatter/tools/util.gd")
 
 const ACTION_PAINT = 0
 const ACTION_ERASE = 1
 
-var _node : Scatter3D
-var _selected_patterns := []
-var _mouse_position := Vector2()
-var _editor_camera : Camera
-var _collision_mask := 1
+var _node = null
+var _pattern = null
+var _mouse_pressed = false
+var _mouse_button = BUTTON_LEFT
+var _pending_paint_completed = false
+var _mouse_position = Vector2()
+var _editor_camera = null
+var _collision_mask = 1
 var _placed_instances = []
 var _removed_instances = []
-var _disable_undo := false
-var _pattern_margin := 0.0
-var _logger = Logger.get_for(self)
-var _current_action := -1
-var _cmd_pending_action := false
+var _disable_undo = false
+var _pattern_margin = 0.0
 
-var _palette : Palette
+var _palette = null
 var _error_dialog = null
 
 
@@ -32,17 +30,17 @@ static func get_icon(name):
 
 
 func _enter_tree():
-	_logger.debug("Scatter plugin Enter tree")
+	print("Scatter plugin Enter tree")
 	# The class is globally named but still need to register it just so the node creation dialog gets it
 	# https://github.com/godotengine/godot/issues/30048
 	add_custom_type("Scatter3D", "Spatial", Scatter3D, get_icon("scatter3d_node"))
 	
 	var base_control = get_editor_interface().get_base_control()
 	
-	_palette = PaletteScene.instance()
-	_palette.connect("patterns_selected", self, "_on_Palette_patterns_selected")
+	_palette = PaletteControl.instance()
+	_palette.connect("pattern_selected", self, "_on_Palette_pattern_selected")
 	_palette.connect("pattern_added", self, "_on_Palette_pattern_added")
-	_palette.connect("patterns_removed", self, "_on_Palette_patterns_removed")
+	_palette.connect("pattern_removed", self, "_on_Palette_pattern_removed")
 	_palette.hide()
 	add_control_to_container(EditorPlugin.CONTAINER_SPATIAL_EDITOR_SIDE_LEFT, _palette)
 	_palette.set_preview_provider(get_editor_interface().get_resource_previewer())
@@ -56,7 +54,7 @@ func _enter_tree():
 	
 
 func _exit_tree():
-	_logger.debug("Scatter plugin Exit tree")
+	print("Scatter plugin Exit tree")
 	edit(null)
 	
 	remove_custom_type("Scatter3D")
@@ -76,6 +74,10 @@ func edit(obj):
 	_node = obj
 	if _node:
 		var patterns = _node.get_patterns()
+		if len(patterns) > 0:
+			set_pattern(patterns[0])
+		else:
+			set_pattern(null)
 		_palette.load_patterns(patterns)
 		set_physics_process(true)
 	else:
@@ -100,41 +102,31 @@ func forward_spatial_gui_input(p_camera, p_event):
 		var mb = p_event
 		
 		if mb.button_index == BUTTON_LEFT or mb.button_index == BUTTON_RIGHT:
+			if mb.pressed == false:
+				_mouse_pressed = false
+
 			# Need to check modifiers before capturing the event,
 			# because they are used in navigation schemes
 			if (not mb.control) and (not mb.alt):# and mb.button_index == BUTTON_LEFT:
 				if mb.pressed:
-					match mb.button_index:
-						BUTTON_LEFT:
-							_current_action = ACTION_PAINT
-						BUTTON_RIGHT:
-							_current_action = ACTION_ERASE
-					_cmd_pending_action = true
+					_mouse_pressed = true
+					_mouse_button = mb.button_index
 				
 				captured_event = true
 				
-				if mb.pressed == false:
-					# Just finished painting gesture
-					_on_action_completed(_current_action)
+				if not _mouse_pressed:
+					# Just finished painting
+					_pending_paint_completed = true
 	
 	elif p_event is InputEventMouseMotion:
 		var mm = p_event
-		var mouse_position = mm.position
-
-		# Need to do an extra conversion in case the editor viewport is in half-resolution mode
-		var viewport = p_camera.get_viewport()
-		var viewport_container = viewport.get_parent()
-		var screen_position = mouse_position * viewport.size / viewport_container.rect_size
-
-		_mouse_position = screen_position
-		# Trigger action only if these buttons are held
-		_cmd_pending_action = mm.button_mask & (BUTTON_MASK_LEFT | BUTTON_MASK_RIGHT)
+		_mouse_position = mm.position
 
 	_editor_camera = p_camera
 	return captured_event
 
 
-func _physics_process(_unused_delta):
+func _physics_process(delta):
 	if _editor_camera == null:
 		return
 	if not is_instance_valid(_editor_camera):
@@ -142,111 +134,100 @@ func _physics_process(_unused_delta):
 		return
 	if _node == null:
 		return
-	
-	if _cmd_pending_action:
-		# Consume
-		_cmd_pending_action = false
-
-		var ray_origin = _editor_camera.project_ray_origin(_mouse_position)
-		var ray_dir = _editor_camera.project_ray_normal(_mouse_position)
-		var ray_distance = _editor_camera.far
-
-		match _current_action:
-			ACTION_PAINT:
-				_paint(ray_origin, ray_origin + ray_dir * ray_distance)
-			ACTION_ERASE:
-				_erase(ray_origin, ray_dir)
-
-
-func _paint(ray_origin: Vector3, ray_end: Vector3):
-	if len(_selected_patterns) == 0:
+	if _pattern == null:
 		return
-	
-	var space_state :=  get_viewport().world.direct_space_state
-	var hit = space_state.intersect_ray(ray_origin, ray_origin + ray_end, [], _collision_mask)
-	
-	if hit.empty():
-		return
-	
-	var hit_instance_root
-	# Collider can be null if the hit is on something that has no associated node
-	if hit.collider != null:
-		hit_instance_root = Util.get_instance_root(hit.collider)
-	
-	if hit.collider == null or not (hit_instance_root.get_parent() is Scatter3D):
-		var pos = hit.position
 		
-		# Not accurate, you might still paint stuff too close to others,
-		# but should be good enough and cheap
-		var too_close = false
-		if len(_placed_instances) != 0:
-			var last_placed_transform := (_placed_instances[-1] as Spatial).global_transform
-			var margin := _pattern_margin + _palette.get_configured_margin()
-			if last_placed_transform.origin.distance_to(pos) < margin:
-				too_close = true
-		
-		if not too_close:
-			var instance = _create_pattern_instance()
-			instance.translation = pos
-			instance.rotate_y(rand_range(-PI, PI))
-			_node.add_child(instance)
-			instance.owner = get_editor_interface().get_edited_scene_root()
-			_placed_instances.append(instance)
+	var ray_origin = _editor_camera.project_ray_origin(_mouse_position)
+	var ray_dir = _editor_camera.project_ray_normal(_mouse_position)
+	var ray_distance = _editor_camera.far
+	
+	var action = null
+	match _mouse_button:
+		BUTTON_LEFT:
+			action = ACTION_PAINT
+		BUTTON_RIGHT:
+			action = ACTION_ERASE
+	
+	if _mouse_pressed:
+		if action == ACTION_PAINT:
+			var space_state =  get_viewport().world.direct_space_state
+			var hit = space_state.intersect_ray(ray_origin, ray_origin + ray_dir * ray_distance, [], _collision_mask)
+			
+			if not hit.empty():
+				var hit_instance_root
+				# Collider can be null if the hit is on something that has no associated node
+				if hit.collider != null:
+					hit_instance_root = Util.get_instance_root(hit.collider)
+				
+				if hit.collider == null or not (hit_instance_root.get_parent() is Scatter3D):
+					var pos = hit.position
+					
+					# Not accurate, you might still paint stuff too close to others,
+					# but should be good enough and cheap
+					var too_close = false
+					if len(_placed_instances) != 0:
+						var last_placed_transform = _placed_instances[-1].global_transform
+						if last_placed_transform.origin.distance_to(pos) < _pattern_margin:
+							too_close = true
+					
+					if not too_close:
+						var instance = _pattern.instance()
+						instance.translation = pos
+						instance.rotate_y(rand_range(-PI, PI))
+						_node.add_child(instance)
+						instance.owner = get_editor_interface().get_edited_scene_root()
+						_placed_instances.append(instance)
+	
+		elif action == ACTION_ERASE:
+			var time_before = OS.get_ticks_usec()
+			var hits = VisualServer.instances_cull_ray(ray_origin, ray_dir, _node.get_world().scenario)
 
+			if len(hits) > 0:
 
-func _erase(ray_origin: Vector3, ray_dir: Vector3):
-	var time_before := OS.get_ticks_usec()
-	var hits := VisualServer.instances_cull_ray(ray_origin, ray_dir, _node.get_world().scenario)
-
-	if len(hits) > 0:
-		var instance = null
-		for hit_object_id in hits:
-			var hit = instance_from_id(hit_object_id)
-			if hit is Spatial:
-				instance = get_scatter_child_instance(hit, _node)
+				var instance = null
+				for hit_object_id in hits:
+					var hit = instance_from_id(hit_object_id)
+					if hit is Spatial:
+						instance = get_scatter_child_instance(hit, _node)
+						if instance != null:
+							break
+				
+				#print("Hits: ", len(hits), ", instance: ", instance)
 				if instance != null:
-					break
+					assert(instance.get_parent() == _node)
+					instance.get_parent().remove_child(instance)
+					_removed_instances.append(instance)
+
+	if _pending_paint_completed:
+		if action == ACTION_PAINT:
+			# TODO This will creep memory until the scene is closed...
+			# Because in Godot, undo/redo of node creation/deletion is done by NOT deleting them.
+			# To stay in line with this, I have to do the same...
+			var ur = get_undo_redo()
+			ur.create_action("Paint scenes")
+			for instance in _placed_instances:
+				# This is what allows nodes to be freed
+				ur.add_do_reference(instance)
+			_disable_undo = true
+			ur.add_do_method(self, "_redo_paint", _node.get_path(), _placed_instances.duplicate(false))
+			ur.add_undo_method(self, "_undo_paint", _node.get_path(), _placed_instances.duplicate(false))
+			ur.commit_action()
+			_disable_undo = false
+			_placed_instances.clear()
+			
+		elif action == ACTION_ERASE:
+			var ur = get_undo_redo()
+			ur.create_action("Erase painted scenes")
+			for instance in _removed_instances:
+				ur.add_undo_reference(instance)
+			_disable_undo = true
+			ur.add_do_method(self, "_redo_erase", _node.get_path(), _removed_instances.duplicate(false))
+			ur.add_undo_method(self, "_undo_erase", _node.get_path(), _removed_instances.duplicate(false))
+			ur.commit_action()
+			_disable_undo = false
+			_removed_instances.clear()
 		
-		#print("Hits: ", len(hits), ", instance: ", instance)
-		if instance != null:
-			assert(instance.get_parent() == _node)
-			instance.get_parent().remove_child(instance)
-			_removed_instances.append(instance)
-
-
-func _on_action_completed(action: int):
-	if action == ACTION_PAINT:
-		if len(_placed_instances) == 0:
-			return
-		# TODO This will creep memory until the scene is closed...
-		# Because in Godot, undo/redo of node creation/deletion is done by NOT deleting them.
-		# To stay in line with this, I have to do the same...
-		var ur = get_undo_redo()
-		ur.create_action("Paint scenes")
-		for instance in _placed_instances:
-			# This is what allows nodes to be freed
-			ur.add_do_reference(instance)
-		_disable_undo = true
-		ur.add_do_method(self, "_redo_paint", _node.get_path(), _placed_instances.duplicate(false))
-		ur.add_undo_method(self, "_undo_paint", _node.get_path(), _placed_instances.duplicate(false))
-		ur.commit_action()
-		_disable_undo = false
-		_placed_instances.clear()
-		
-	elif action == ACTION_ERASE:
-		if len(_removed_instances) == 0:
-			return
-		var ur = get_undo_redo()
-		ur.create_action("Erase painted scenes")
-		for instance in _removed_instances:
-			ur.add_undo_reference(instance)
-		_disable_undo = true
-		ur.add_do_method(self, "_redo_erase", _node.get_path(), _removed_instances.duplicate(false))
-		ur.add_undo_method(self, "_undo_erase", _node.get_path(), _removed_instances.duplicate(false))
-		ur.commit_action()
-		_disable_undo = false
-		_removed_instances.clear()
-
+		_pending_paint_completed = false
 
 #func resnap_instances():
 #	pass
@@ -296,64 +277,55 @@ static func get_scatter_child_instance(node, scatter_root):
 	return null
 
 
-func _set_selected_patterns(patterns):
-	if _selected_patterns != patterns:
-		_selected_patterns = patterns
-		var largest_aabb = AABB()
-		for pattern in patterns:
-			var temp = pattern.instance()
-			# TODO This causes errors because of accessing `global_transform` outside the tree... Oo
-			# See https://github.com/godotengine/godot/issues/30445
-			largest_aabb = largest_aabb.merge(Util.get_scene_aabb(temp))
-			temp.free()
-		_pattern_margin = largest_aabb.size.length() * 0.4
-		_logger.debug(str("Pattern margin is ", _pattern_margin))
+func set_pattern(pattern):
+	if _pattern != pattern:
+		_pattern = pattern
+		var temp = pattern.instance()
+		# TODO This causes errors because of accessing `global_transform` outside the tree... Oo
+		# See https://github.com/godotengine/godot/issues/30445
+		var aabb = Util.get_scene_aabb(temp)
+		_pattern_margin = aabb.size.length() * 0.4
+		temp.free()
+		print("Pattern margin is ", _pattern_margin)
 
 
-func _create_pattern_instance():
-	return _selected_patterns[floor(randf() * _selected_patterns.size())].instance()
-
-
-func _on_Palette_patterns_selected(pattern_paths):
-	var scenes = []
-	for file in pattern_paths:
-		scenes.append(load(file))
-	_set_selected_patterns(scenes)
+func _on_Palette_pattern_selected(pattern_index):
+	var patterns = _node.get_patterns()
+	set_pattern(patterns[pattern_index])
 
 
 func _on_Palette_pattern_added(path):
-	if not _verify_scene(path):
+	if not verify_scene(path):
 		return
 	# TODO Duh, may not work if the file was moved or renamed... I'm tired of this
 	var ur = get_undo_redo()
 	ur.create_action("Add scatter pattern")
-	ur.add_do_method(self, "_add_pattern", path)
-	ur.add_undo_method(self, "_remove_pattern", path)
+	ur.add_do_method(self, "add_pattern", path)
+	ur.add_undo_method(self, "remove_pattern", path)
 	ur.commit_action()
 
 
-func _on_Palette_patterns_removed(paths):
+func _on_Palette_pattern_removed(path):
 	var ur = get_undo_redo()
 	ur.create_action("Remove scatter pattern")
-	for path in paths:
-		ur.add_do_method(self, "_remove_pattern", path)
-		ur.add_undo_method(self, "_add_pattern", path)
+	ur.add_do_method(self, "remove_pattern", path)
+	ur.add_undo_method(self, "add_pattern", path)
 	ur.commit_action()
 
 
-func _add_pattern(path):
-	_logger.debug(str("Adding pattern ", path))
+func add_pattern(path):
+	print("Adding pattern ", path)
 	_node.add_pattern(path)
 	_palette.add_pattern(path)
 
 
-func _remove_pattern(path):
-	_logger.debug(str("Removing pattern ", path))
+func remove_pattern(path):
+	print("Removing pattern ", path)
 	_node.remove_pattern(path)
 	_palette.remove_pattern(path)
 
 
-func _verify_scene(fpath):
+func verify_scene(fpath):
 	# Check it can be loaded
 	var scene = load(fpath)
 	if scene == null:

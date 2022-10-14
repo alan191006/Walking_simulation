@@ -1,5 +1,6 @@
 extends KinematicBody
 
+
 export(NodePath) var cam_path := NodePath("Camera")
 onready var camera: Camera = get_node(cam_path)
 
@@ -9,24 +10,34 @@ var gravity : float = 25.0
 var stop_on_slope := true
 export var jump_height := 15
 onready var floor_max_angle: float = deg2rad(45.0)
-
-var moveSpeed : float = 16.0
+export var mouse_sensitivity := 2.0
+export var y_limit := 90.0
+var mouse_axis := Vector2()
 export var acceleration := 8
 export var deceleration := 10
-export(float, 0.0, 1.0, 0.05) var air_control := 0.3
-
+var direction := Vector3()
+var rot := Vector3()
+export var speed := 200
 var input_axis := Vector2()
 var velocity := Vector3()
-var direction := Vector3()
+var up_direction := Vector3.UP
+# stats
+var curHp : int = 10
+var maxHp : int = 10
+var ammo : int = 15
+var score: int = 0
 
-var is_inventory_on = false
+# physics
+var moveSpeed : float = 100
+var jumpForce : float = 10.0
+# var gravity : float = 800.0
 
 # cam look
 var minLookAngle : float = 0.0
 var maxLookAngle : float = 180.0
 var lookSensitivity : float = 10.0
 var snap := Vector3()
-
+export(float, 0.0, 1.0, 0.05) var air_control := 0.3
 # vectors
 var vel : Vector3 = Vector3()
 var mouseDelta : Vector2 = Vector2()
@@ -37,6 +48,9 @@ var animal_interact =  {"NVN": false,
 func _ready ():
 	# hide and lock the mouse cursor
 	Input.set_mouse_mode(Input.MOUSE_MODE_CAPTURED)
+	Input.set_mouse_mode(Input.MOUSE_MODE_VISIBLE)
+	
+	# set the UI
 
 
 # called 60 times a second
@@ -98,22 +112,18 @@ func _process(delta):
 	# reset the mouse delta vector
 	mouseDelta = Vector2()
 
+# called when an input is detected
 func _input(event):
 	
 	if event is InputEventMouseMotion:
 		mouseDelta = event.relative
-		
-	if event.is_action_pressed("book"):
-		is_inventory_on = not is_inventory_on
-		match Input.get_mouse_mode():
-			Input.MOUSE_MODE_CAPTURED:
-				Input.set_mouse_mode(Input.MOUSE_MODE_VISIBLE)
-			Input.MOUSE_MODE_VISIBLE:
-				Input.set_mouse_mode(Input.MOUSE_MODE_CAPTURED)
+	
 	if event.is_action_pressed("sprint"):
-		moveSpeed = 30
+		speed = 200
 	else:
-		moveSpeed = 20
+		speed = 100
+		
+
 
 func info():
 	name = raycast.get_collider().name

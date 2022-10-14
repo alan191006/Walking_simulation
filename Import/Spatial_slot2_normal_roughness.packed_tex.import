@@ -1,0 +1,19 @@
+[remap]
+
+importer="hterrain_packed_texture_importer"
+type="StreamTexture"
+path.s3tc="res://.import/Spatial_slot2_normal_roughness.packed_tex-05878e64d5b2c49b7aa6209e00aee1f2.s3tc.stex"
+path.etc2="res://.import/Spatial_slot2_normal_roughness.packed_tex-05878e64d5b2c49b7aa6209e00aee1f2.etc2.stex"
+
+[deps]
+
+source_file="res://Import/Spatial_slot2_normal_roughness.packed_tex"
+dest_files=[ "res://.import/Spatial_slot2_normal_roughness.packed_tex-05878e64d5b2c49b7aa6209e00aee1f2.s3tc.stex", "res://.import/Spatial_slot2_normal_roughness.packed_tex-05878e64d5b2c49b7aa6209e00aee1f2.etc2.stex" ]
+
+[params]
+
+compress/mode=2
+flags/repeat=1
+flags/filter=true
+flags/mipmaps=true
+flags/anisotropic=false

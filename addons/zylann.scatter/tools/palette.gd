@@ -1,18 +1,14 @@
 tool
 extends Control
 
-const Logger = preload("../util/logger.gd")
-
-signal patterns_selected(pattern_paths)
+signal pattern_selected(pattern_index)
 signal pattern_added(path)
-signal patterns_removed(path)
+signal pattern_removed(path)
 
 onready var _item_list : ItemList = get_node("VBoxContainer/ItemList")
-onready var _margin_spin_box : SpinBox = get_node("VBoxContainer/MarginContainer/MarginSpinBox")
 
 var _file_dialog = null
 var _preview_provider : EditorResourcePreview = null
-var _logger = Logger.get_for(self)
 
 
 func setup_dialogs(base_control):
@@ -39,10 +35,15 @@ func _exit_tree():
 
 
 func load_patterns(patterns):
+	var selected_pattern = get_selected_pattern()
 	_item_list.clear()
 	#print("Loading ", len(patterns), " patterns")
 	for scene in patterns:
 		add_pattern(scene.resource_path)
+	if selected_pattern != null:
+		var i = find_pattern(selected_pattern.path)
+		if i != -1:
+			_item_list.select(i)
 
 
 func add_pattern(scene_path):
@@ -64,7 +65,7 @@ func _on_EditorResourcePreview_preview_loaded(path, texture, userdata):
 	if texture != null:
 		_item_list.set_item_icon(i, texture)
 	else:
-		_logger.debug(str("No preview available for ", path))
+		print("No preview available for ", path)
 
 
 func _on_EditorResourcePreview_preview_invalidated(path):
@@ -77,6 +78,18 @@ func remove_pattern(scene_path):
 	var i = find_pattern(scene_path)
 	if i != -1:
 		_item_list.remove_item(i)
+
+
+func get_selected_pattern():
+	var selected_items = _item_list.get_selected_items()
+	if len(selected_items) == 0:
+		return null
+	var i = selected_items[0]
+	var scene_path = _item_list.get_item_metadata(i)
+	return {
+		"index": i,
+		"path": scene_path
+	}
 
 
 func find_pattern(path):
@@ -93,15 +106,8 @@ func select_pattern(path):
 		_item_list.select(i)
 
 
-func _on_ItemList_multi_selected(_unused_index, _unused_selected):
-	var selected = []
-	for item in _item_list.get_selected_items():
-		selected.append(_item_list.get_item_metadata(item))
-	emit_signal("patterns_selected", selected)
-
-
-func get_configured_margin() -> float:
-	return _margin_spin_box.value
+func _on_ItemList_item_selected(index):
+	emit_signal("pattern_selected", index)
 
 
 func _on_AddButton_pressed():
@@ -109,20 +115,13 @@ func _on_AddButton_pressed():
 
 
 func _on_RemoveButton_pressed():
-	var removed := []
-	for item in _item_list.get_selected_items():
-		removed.append(_item_list.get_item_metadata(item))
-	emit_signal("patterns_removed", removed)
+	var s = get_selected_pattern()
+	if s == null:
+		return
+	emit_signal("pattern_removed", s.path)
 
 
 func _on_FileDialog_file_selected(fpath):
 	emit_signal("pattern_added", fpath)
 
 
-func can_drop_data(position, data):
-	return data is Dictionary and data.get("type") == "files"
-
-
-func drop_data(position, data):
-	for file in data.files:
-		emit_signal("pattern_added", file)
