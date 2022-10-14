@@ -1,0 +1,28 @@
+[gd_scene load_steps=5 format=2]
+
+[ext_resource path="res://Animal/Spider/Scripts/Aggresive_spider.gd" type="Script" id=1]
+
+[sub_resource type="CapsuleShape" id=1]
+
+[sub_resource type="CapsuleMesh" id=2]
+
+[sub_resource type="CapsuleShape" id=3]
+radius = 1.2245
+height = 0.533616
+
+[node name="Spider" type="KinematicBody"]
+script = ExtResource( 1 )
+
+[node name="CollisionShape" type="CollisionShape" parent="."]
+transform = Transform( 1, 0, 0, 0, -0.000497728, 0.133359, 0, -0.999999, -0.000293812, 0, 0, 0 )
+shape = SubResource( 1 )
+
+[node name="Model" type="MeshInstance" parent="."]
+transform = Transform( 1, 0, 0, 0, -0.000497728, 0.133359, 0, -0.999999, -0.000293812, 0, 0, 0 )
+mesh = SubResource( 2 )
+
+[node name="S" type="Area" parent="."]
+
+[node name="CollisionShape" type="CollisionShape" parent="S"]
+transform = Transform( 1.07976, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0 )
+shape = SubResource( 3 )

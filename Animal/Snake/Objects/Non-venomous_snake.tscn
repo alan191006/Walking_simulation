@@ -1,6 +1,6 @@
-[gd_scene load_steps=6 format=2]
+[gd_scene load_steps=7 format=2]
 
-[ext_resource path="res://Venomous_snake.gd" type="Script" id=1]
+[ext_resource path="res://Animal/Snake/Scripts/Non-venomous_snake.gd" type="Script" id=1]
 
 [sub_resource type="CapsuleShape" id=1]
 
@@ -10,7 +10,11 @@
 
 [sub_resource type="SpatialMaterial" id=4]
 
-[node name="Snake" type="KinematicBody"]
+[sub_resource type="CapsuleShape" id=5]
+radius = 1.2245
+height = 2.462
+
+[node name="Venomous_snake" type="KinematicBody"]
 script = ExtResource( 1 )
 
 [node name="CollisionShape" type="CollisionShape" parent="."]
@@ -23,3 +27,8 @@ mesh = SubResource( 2 )
 skin = SubResource( 3 )
 skeleton = NodePath("")
 material/0 = SubResource( 4 )
+
+[node name="NVN" type="Area" parent="."]
+
+[node name="CollisionShape" type="CollisionShape" parent="NVN"]
+shape = SubResource( 5 )

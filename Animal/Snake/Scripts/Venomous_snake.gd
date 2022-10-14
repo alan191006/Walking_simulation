@@ -35,6 +35,3 @@ func _physics_process(delta):
 				state = IDLE
 			else:
 				move_and_slide(dir * moveSpeed, Vector3.UP)
-				
-	
-

@@ -1,11 +1,13 @@
 extends KinematicBody
 
 export(NodePath) var cam_path := NodePath("Camera")
-onready var cam: Camera = get_node(cam_path)
+onready var camera: Camera = get_node(cam_path)
 
-var gravity : float = 15.0
+onready var raycast = camera.get_node("RayCast")
+
+var gravity : float = 25.0
 var stop_on_slope := true
-export var jump_height := 10
+export var jump_height := 15
 onready var floor_max_angle: float = deg2rad(45.0)
 
 var moveSpeed : float = 16.0
@@ -26,49 +28,75 @@ var lookSensitivity : float = 10.0
 var snap := Vector3()
 
 # vectors
+var vel : Vector3 = Vector3()
 var mouseDelta : Vector2 = Vector2()
 
+var animal_interact =  {"NVN": false,
+						"S"  : false}
+
 func _ready ():
+	# hide and lock the mouse cursor
 	Input.set_mouse_mode(Input.MOUSE_MODE_CAPTURED)
 
-func _physics_process(delta) -> void:
-	if not is_inventory_on:
-		input_axis = Input.get_vector("move_back", "move_forward",
-				"move_left", "move_right")
-		
-		direction_input()
-		
-		if is_on_floor():
-			snap = -get_floor_normal() - get_floor_velocity() * delta
-			
-			# Workaround for sliding down after jump on slope
-			if velocity.y < 0:
-				velocity.y = 0
-			
-			if Input.is_action_just_pressed("jump"):
-				snap = Vector3.ZERO
-				velocity.y = jump_height
-		else:
-			# Workaround for 'vertical bump' when going off platform
-			if snap != Vector3.ZERO && velocity.y != 0:
-				velocity.y = 0
-			
-			snap = Vector3.ZERO
-			
-			velocity.y -= gravity * delta
-		
-		accelerate(delta)
-		
-		velocity = move_and_slide_with_snap(velocity, snap, Vector3.UP, 
-				stop_on_slope, 4, floor_max_angle)
 
+# called 60 times a second
+func _physics_process(delta):
+	
+	if raycast.is_colliding():
+		if Input.is_action_just_pressed("interact"):
+			info()
+
+	# reset the x and z velocity
+	vel.x = 0
+	vel.z = 0
+	
+	var input = Vector2()
+	
+	# movement inputs
+	if Input.is_action_pressed("move_forward"):
+		input.y -= 1
+	if Input.is_action_pressed("move_backward"):
+		input.y += 1
+	if Input.is_action_pressed("move_left"):
+		input.x -= 1
+	if Input.is_action_pressed("move_right"):
+		input.x += 1
+		
+	input = input.normalized()
+	
+	# get the forward and right directions
+	var forward = -global_transform.basis.y
+	var right   = global_transform.basis.x
+	
+	var relativeDir = (forward * input.y + right * input.x)
+	# set the velocity
+	vel.x = relativeDir.x * moveSpeed
+	vel.z = relativeDir.z * moveSpeed
+	
+	# apply gravity
+	vel.y -= gravity * delta
+	
+	# move the player
+	vel = move_and_slide(vel, Vector3.UP)
+	
+	# jumping
+	if Input.is_action_pressed("jump") and is_on_floor():
+		vel.y = jump_height
+
+# called every frame	
 func _process(delta):
 	
-	if not is_inventory_on:
-		cam.rotation_degrees.x -= mouseDelta.y * lookSensitivity * delta
-		cam.rotation_degrees.x = clamp(cam.rotation_degrees.x, minLookAngle, maxLookAngle)
-		rotation_degrees.y -= mouseDelta.x * lookSensitivity * delta
-		mouseDelta = Vector2()
+	# rotate the camera along the x axis
+	camera.rotation_degrees.x -= mouseDelta.y * lookSensitivity * delta
+	
+	# clamp camera x rotation axis
+	camera.rotation_degrees.x = clamp(camera.rotation_degrees.x, minLookAngle, maxLookAngle)
+	
+	# rotate the player along their y axis
+	rotation_degrees.y -= mouseDelta.x * lookSensitivity * delta
+	
+	# reset the mouse delta vector
+	mouseDelta = Vector2()
 
 func _input(event):
 	
@@ -87,37 +115,7 @@ func _input(event):
 	else:
 		moveSpeed = 20
 
-func direction_input() -> void:
-	direction = Vector3()
-	var aim: Basis = get_global_transform().basis
-	if input_axis.x >= 0.5:
-		direction += aim.z
-	if input_axis.x <= -0.5:
-		direction -= aim.z
-	if input_axis.y <= -0.5:
-		direction -= aim.x
-	if input_axis.y >= 0.5:
-		direction += aim.x
-	direction.y = 0
-	direction = direction.normalized()
-
-func accelerate(delta: float) -> void:
-	# Using only the horizontal velocity, interpolate towards the input.
-	var temp_vel := velocity
-	temp_vel.y = 0
-	
-	var temp_accel: float
-	var target: Vector3 = direction * moveSpeed
-	
-	if direction.dot(temp_vel) > 0:
-		temp_accel = acceleration
-	else:
-		temp_accel = deceleration
-	
-	if not is_on_floor():
-		temp_accel *= air_control
-	
-	temp_vel = temp_vel.linear_interpolate(target, temp_accel * delta)
-	
-	velocity.x = temp_vel.x
-	velocity.z = temp_vel.z
+func info():
+	name = raycast.get_collider().name
+	animal_interact[name] = true
+	print(animal_interact)

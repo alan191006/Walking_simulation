@@ -1,0 +1,15 @@
+[gd_scene load_steps=3 format=2]
+
+[sub_resource type="CapsuleShape" id=1]
+
+[sub_resource type="CapsuleMesh" id=2]
+
+[node name="Spider" type="KinematicBody"]
+
+[node name="CollisionShape" type="CollisionShape" parent="."]
+transform = Transform( 1, 0, 0, 0, -0.000497728, 0.133359, 0, -0.999999, -0.000293812, 0, 0, 0 )
+shape = SubResource( 1 )
+
+[node name="Model" type="MeshInstance" parent="."]
+transform = Transform( 1, 0, 0, 0, -0.000497728, 0.133359, 0, -0.999999, -0.000293812, 0, 0, 0 )
+mesh = SubResource( 2 )
